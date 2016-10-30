@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Marello
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is published at http://opensource.org/licenses/osl-3.0.php.
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@marello.com so we can send you a copy immediately
+ *
+ * @category  Marello
+ * @package   Bridge
+ * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="marello" translate="label" sortOrder="200">
+            <label>Marello</label>
+        </tab>
+        <section id="marellobridgesettings" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1"
+                 showInStore="0">
+            <class>separator-top</class>
+            <label>Marello Bridge</label>
+            <tab>marello</tab>
+            <resource>Marello_Bridge::marello_bridge</resource>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>General Settings</label>
+                <field id="enabled" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Enable Bridge</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="test_mode" translate="label" type="select" sortOrder="25" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Enable Test Mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="api_url" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Url</label>
+                    <comment>i.e. http://marello-example.com/</comment>
+                </field>
+                <field id="api_key" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Api Key</label>
+                </field>
+
+                <field id="api_username" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Username</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="mapping" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Mapping Settings</label>
+                <field id="websites" translate="label" showInDefault="1" sortOrder="100">
+                    <label>Add website mapping</label>
+                    <frontend_model>Marello\Bridge\Block\Adminhtml\System\Config\Website</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="return_reasons" translate="label" showInDefault="1" sortOrder="120">
+                    <label>Add return reason mapping</label>
+                    <frontend_model>Marello\Bridge\Block\Adminhtml\System\Config\ReturnReason</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

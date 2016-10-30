@@ -1,0 +1,183 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Marello
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is published at http://opensource.org/licenses/osl-3.0.php.
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@marello.com so we can send you a copy immediately
+ *
+ * @category  Marello
+ * @package   Bridge
+ * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <preference for="Marello\Bridge\Api\Data\TransportSettingsInterface" type="Marello\Bridge\Model\Transport\TransportSettings" />
+    <preference for="Marello\Bridge\Api\Data\DataConverterRegistryInterface" type="Marello\Bridge\Model\Converter\DataConverterRegistry" />
+    <preference for="Marello\Bridge\Api\Data\ConnectorRegistryInterface" type="Marello\Bridge\Model\Connector\ConnectorRegistry" />
+    <preference for="Marello\Bridge\Api\EntityQueueRepositoryInterface" type="Marello\Bridge\Model\Queue\EntityQueueRepository" />
+    <preference for="Marello\Bridge\Api\EntityQueueManagementInterface" type="Marello\Bridge\Model\Queue\EntityQueueManagement" />
+
+    <type name="Marello\Bridge\Model\Processor\NewOrderProcessor">
+        <arguments>
+            <argument name="connectorRegistry" xsi:type="object">Marello\Bridge\Model\Connector\ConnectorRegistry</argument>
+            <argument name="converterRegistry" xsi:type="object">Marello\Bridge\Model\Converter\DataConverterRegistry\Proxy</argument>
+            <argument name="transport" xsi:type="object">Marello\Bridge\Model\Transport\RestTransport\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Model\Processor\RmaProcessor">
+        <arguments>
+            <argument name="connectorRegistry" xsi:type="object">Marello\Bridge\Model\Connector\ConnectorRegistry</argument>
+            <argument name="converterRegistry" xsi:type="object">Marello\Bridge\Model\Converter\DataConverterRegistry\Proxy</argument>
+            <argument name="transport" xsi:type="object">Marello\Bridge\Model\Transport\RestTransport\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Model\Processor\UpdateOrderProcessor">
+        <arguments>
+            <argument name="connectorRegistry" xsi:type="object">Marello\Bridge\Model\Connector\ConnectorRegistry</argument>
+            <argument name="converterRegistry" xsi:type="object">Marello\Bridge\Model\Converter\DataConverterRegistry\Proxy</argument>
+            <argument name="transport" xsi:type="object">Marello\Bridge\Model\Transport\RestTransport\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Model\Service\ShipmentService">
+        <arguments>
+            <argument name="orderConverter" xsi:type="object">Magento\Sales\Model\Convert\Order\Proxy</argument>
+            <argument name="dbTransaction" xsi:type="object">Magento\Framework\DB\Transaction</argument>
+            <argument name="orderGrid" xsi:type="object">MarelloOrderIndexGridSyncInsert</argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Model\Processor\ProductProcessor">
+        <arguments>
+            <argument name="connectorRegistry" xsi:type="object">Marello\Bridge\Model\Connector\ConnectorRegistry</argument>
+            <argument name="converterRegistry" xsi:type="object">Marello\Bridge\Model\Converter\DataConverterRegistry\Proxy</argument>
+            <argument name="transport" xsi:type="object">Marello\Bridge\Model\Transport\RestTransport\Proxy</argument>
+            <argument name="writer" xsi:type="object">Marello\Bridge\Model\Writer\EntityWriter\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Model\Converter\OrderDataConverter">
+        <arguments>
+            <argument name="helper" xsi:type="object">Marello\Bridge\Helper\Config\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Model\Converter\ProductDataConverter">
+        <arguments>
+            <argument name="helper" xsi:type="object">Marello\Bridge\Helper\Config\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Model\Converter\RmaDataConverter">
+        <arguments>
+            <argument name="helper" xsi:type="object">Marello\Bridge\Helper\Config\Proxy</argument>
+            <argument name="returnItemCollectionFactory" xsi:type="object">Magento\Rma\Model\ResourceModel\Item\CollectionFactory</argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Model\Connector\ConnectorRegistry">
+        <arguments>
+            <argument name="connectors" xsi:type="array">
+                <item name="export" xsi:type="array">
+                    <item name="default" xsi:type="object">Marello\Bridge\Model\Connector\DefaultConnector</item>
+                    <item name="order" xsi:type="object">Marello\Bridge\Model\Connector\OrderConnector</item>
+                    <item name="rma" xsi:type="object">Marello\Bridge\Model\Connector\RmaConnector</item>
+                    <item name="customer" xsi:type="object">Marello\Bridge\Model\Connector\CustomerConnector</item>
+                </item>
+                <item name="import" xsi:type="array">
+                    <item name="default" xsi:type="object">Marello\Bridge\Model\Connector\DefaultConnector</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Model\Converter\DataConverterRegistry">
+        <arguments>
+            <argument name="converters" xsi:type="array">
+                <item name="order" xsi:type="object">Marello\Bridge\Model\Converter\OrderDataConverter</item>
+                <item name="rma" xsi:type="object">Marello\Bridge\Model\Converter\RmaDataConverter</item>
+                <item name="customer" xsi:type="object">Marello\Bridge\Model\Converter\CustomerDataConverter</item>
+                <item name="product" xsi:type="object">Marello\Bridge\Model\Converter\ProductDataConverter</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Model\Processor\ProcessorRegistry">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="order_create" xsi:type="object">Marello\Bridge\Model\Processor\NewOrderProcessor</item>
+                <item name="order_invoice" xsi:type="object">Marello\Bridge\Model\Processor\UpdateOrderProcessor</item>
+                <item name="order_cancel" xsi:type="object">Marello\Bridge\Model\Processor\UpdateOrderProcessor</item>
+                <item name="rma_create" xsi:type="object">Marello\Bridge\Model\Processor\RmaProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Model\EntityRepositoryRegistry">
+        <arguments>
+            <argument name="repositories" xsi:type="array">
+                <item name="order" xsi:type="object">Magento\Sales\Model\OrderRepository</item>
+                <item name="rma" xsi:type="object">Magento\Rma\Model\RmaRepository</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Observer\CreateOrder">
+        <arguments>
+            <argument name="entityQueueRepository" xsi:type="object">Marello\Bridge\Model\Queue\EntityQueueRepository\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Observer\UpdateOrder">
+        <arguments>
+            <argument name="entityQueueRepository" xsi:type="object">Marello\Bridge\Model\Queue\EntityQueueRepository\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Observer\CancelOrder">
+        <arguments>
+            <argument name="entityQueueRepository" xsi:type="object">Marello\Bridge\Model\Queue\EntityQueueRepository\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Marello\Bridge\Observer\CreateReturn">
+        <arguments>
+            <argument name="entityQueueRepository" xsi:type="object">Marello\Bridge\Model\Queue\EntityQueueRepository\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="marello:cron:import-products" xsi:type="object">Marello\Bridge\Console\Command\ImportCommand</item>
+                <item name="marello:cron:update-orders" xsi:type="object">Marello\Bridge\Console\Command\OrderUpdateCommand</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Magento\Sales\Model\ResourceModel\Order\Grid" type="Magento\Sales\Model\ResourceModel\Grid">
+        <arguments>
+            <argument name="columns" xsi:type="array">
+                <item name="marello_export_status" xsi:type="string">sales_order.marello_data</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MarelloOrderIndexGridSyncInsert" type="Marello\Bridge\Model\OrderGridSyncRefresh">
+        <arguments>
+            <argument name="entityGrid" xsi:type="object">Magento\Sales\Model\ResourceModel\Order\Grid</argument>
+        </arguments>
+    </virtualType>
+
+</config>

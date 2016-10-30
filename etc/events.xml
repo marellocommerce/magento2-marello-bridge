@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Marello
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is published at http://opensource.org/licenses/osl-3.0.php.
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@marello.com so we can send you a copy immediately
+ *
+ * @category  Marello
+ * @package   Bridge
+ * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="sales_order_save_after">
+        <observer name="marello_bridge_sync_create_order" instance="Marello\Bridge\Observer\CreateOrder" />
+        <observer name="marello_bridge_sync_update_order" instance="Marello\Bridge\Observer\UpdateOrder" />
+        <observer name="marello_bridge_sync_cancel_order" instance="Marello\Bridge\Observer\CancelOrder" />
+    </event>
+
+    <event name="core_abstract_save_after">
+        <observer name="marello_bridge_sync_create_return" instance="Marello\Bridge\Observer\CreateReturn" />
+    </event>
+</config>

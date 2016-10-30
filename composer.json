@@ -1,0 +1,43 @@
+{
+    "name": "marellocommerce/magento2-marello-bridge",
+    "description": "Marello Bridge Extension for Magento 2",
+    "homepage": "https://github.com/marellocommerce/magento2-marello-bridge.git",
+    "authors": [
+        {
+            "name": "Marello",
+            "homepage": "http://www.marello.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/marellocommerce/magento2-marello-bridge-api.git",
+            "branch": "master"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "magento/framework": "100.0.*",
+        "marellocommerce/magento2-marello-bridge-api": "dev-master"
+    },
+    "type": "magento2-module",
+    "version": "1.0.0-alpha",
+    "license": [
+        "OSL-3.0"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Marello\\Bridge\\": ""
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        }
+    }
+}

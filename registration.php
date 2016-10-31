@@ -10,7 +10,8 @@
  * obtain it through the world-wide-web, please send an email
  * to license@marello.com so we can send you a copy immediately
  *
- * @package   Marello_Bridge
+ * @category  Marello
+ * @package   Bridge
  * @copyright Copyright 2016 Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */

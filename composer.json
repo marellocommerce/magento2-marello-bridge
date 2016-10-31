@@ -8,20 +8,12 @@
             "homepage": "http://www.marello.com"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/marellocommerce/magento2-marello-bridge-api.git",
-            "branch": "master"
-        }
-    ],
     "require": {
         "php": ">=5.5.0",
         "magento/framework": "100.0.*",
-        "marellocommerce/magento2-marello-bridge-api": "dev-master"
+        "marellocommerce/marello-bridge-api": "dev-master"
     },
     "type": "magento2-module",
-    "version": "1.0.0-alpha",
     "license": [
         "OSL-3.0"
     ],
@@ -33,7 +25,7 @@
             "Marello\\Bridge\\": ""
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "alpha",
     "prefer-stable": true,
     "extra": {
         "branch-alias": {

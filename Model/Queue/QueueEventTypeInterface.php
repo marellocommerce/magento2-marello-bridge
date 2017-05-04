@@ -28,6 +28,4 @@ interface QueueEventTypeInterface
     const QUEUE_EVENT_TYPE_ORDER_CREATE     = 'order_create';
     const QUEUE_EVENT_TYPE_ORDER_INVOICE    = 'order_invoice';
     const QUEUE_EVENT_TYPE_ORDER_CANCEL     = 'order_cancel';
-
-    const QUEUE_EVENT_TYPE_RMA_CREATE       = 'rma_create';
 }

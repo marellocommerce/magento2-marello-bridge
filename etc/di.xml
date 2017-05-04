@@ -34,14 +34,6 @@
         </arguments>
     </type>
 
-    <type name="Marello\Bridge\Model\Processor\RmaProcessor">
-        <arguments>
-            <argument name="connectorRegistry" xsi:type="object">Marello\Bridge\Model\Connector\ConnectorRegistry</argument>
-            <argument name="converterRegistry" xsi:type="object">Marello\Bridge\Model\Converter\DataConverterRegistry\Proxy</argument>
-            <argument name="transport" xsi:type="object">Marello\Bridge\Model\Transport\RestTransport\Proxy</argument>
-        </arguments>
-    </type>
-
     <type name="Marello\Bridge\Model\Processor\UpdateOrderProcessor">
         <arguments>
             <argument name="connectorRegistry" xsi:type="object">Marello\Bridge\Model\Connector\ConnectorRegistry</argument>
@@ -79,20 +71,12 @@
         </arguments>
     </type>
 
-    <type name="Marello\Bridge\Model\Converter\RmaDataConverter">
-        <arguments>
-            <argument name="helper" xsi:type="object">Marello\Bridge\Helper\Config\Proxy</argument>
-            <argument name="returnItemCollectionFactory" xsi:type="object">Magento\Rma\Model\ResourceModel\Item\CollectionFactory</argument>
-        </arguments>
-    </type>
-
     <type name="Marello\Bridge\Model\Connector\ConnectorRegistry">
         <arguments>
             <argument name="connectors" xsi:type="array">
                 <item name="export" xsi:type="array">
                     <item name="default" xsi:type="object">Marello\Bridge\Model\Connector\DefaultConnector</item>
                     <item name="order" xsi:type="object">Marello\Bridge\Model\Connector\OrderConnector</item>
-                    <item name="rma" xsi:type="object">Marello\Bridge\Model\Connector\RmaConnector</item>
                     <item name="customer" xsi:type="object">Marello\Bridge\Model\Connector\CustomerConnector</item>
                 </item>
                 <item name="import" xsi:type="array">
@@ -106,7 +90,6 @@
         <arguments>
             <argument name="converters" xsi:type="array">
                 <item name="order" xsi:type="object">Marello\Bridge\Model\Converter\OrderDataConverter</item>
-                <item name="rma" xsi:type="object">Marello\Bridge\Model\Converter\RmaDataConverter</item>
                 <item name="customer" xsi:type="object">Marello\Bridge\Model\Converter\CustomerDataConverter</item>
                 <item name="product" xsi:type="object">Marello\Bridge\Model\Converter\ProductDataConverter</item>
             </argument>
@@ -119,7 +102,6 @@
                 <item name="order_create" xsi:type="object">Marello\Bridge\Model\Processor\NewOrderProcessor</item>
                 <item name="order_invoice" xsi:type="object">Marello\Bridge\Model\Processor\UpdateOrderProcessor</item>
                 <item name="order_cancel" xsi:type="object">Marello\Bridge\Model\Processor\UpdateOrderProcessor</item>
-                <item name="rma_create" xsi:type="object">Marello\Bridge\Model\Processor\RmaProcessor</item>
             </argument>
         </arguments>
     </type>
@@ -128,7 +110,6 @@
         <arguments>
             <argument name="repositories" xsi:type="array">
                 <item name="order" xsi:type="object">Magento\Sales\Model\OrderRepository</item>
-                <item name="rma" xsi:type="object">Magento\Rma\Model\RmaRepository</item>
             </argument>
         </arguments>
     </type>
@@ -146,12 +127,6 @@
     </type>
 
     <type name="Marello\Bridge\Observer\CancelOrder">
-        <arguments>
-            <argument name="entityQueueRepository" xsi:type="object">Marello\Bridge\Model\Queue\EntityQueueRepository\Proxy</argument>
-        </arguments>
-    </type>
-
-    <type name="Marello\Bridge\Observer\CreateReturn">
         <arguments>
             <argument name="entityQueueRepository" xsi:type="object">Marello\Bridge\Model\Queue\EntityQueueRepository\Proxy</argument>
         </arguments>

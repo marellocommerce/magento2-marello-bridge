@@ -23,8 +23,4 @@
         <observer name="marello_bridge_sync_update_order" instance="Marello\Bridge\Observer\UpdateOrder" />
         <observer name="marello_bridge_sync_cancel_order" instance="Marello\Bridge\Observer\CancelOrder" />
     </event>
-
-    <event name="core_abstract_save_after">
-        <observer name="marello_bridge_sync_create_return" instance="Marello\Bridge\Observer\CreateReturn" />
-    </event>
 </config>

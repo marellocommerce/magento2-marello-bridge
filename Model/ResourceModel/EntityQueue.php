@@ -23,6 +23,8 @@ use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 class EntityQueue extends AbstractDb
 {
     const MAIN_TABLE_NAME = 'marello_entity_queue';
+
+    // @codingStandardsIgnoreStart
     /**
      * Define main table
      */
@@ -30,7 +32,14 @@ class EntityQueue extends AbstractDb
     {
         $this->_init(self::MAIN_TABLE_NAME, 'id');
     }
+    // @codingStandardsIgnoreStart
 
+    /**
+     * Find a EntityQueue record on magento id and event type
+     * @param $magId
+     * @param $eventType
+     * @return string
+     */
     public function findOneByIdAndEventType($magId, $eventType)
     {
         $connection = $this->getConnection();

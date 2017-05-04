@@ -76,7 +76,9 @@ abstract class AbstractProcessor
     {
         $connectors = $this->connectorRegistry->getConnectors();
         if (!isset($connectors[$type][$alias]) && empty($connectors[$type][$alias])) {
-            throw new \InvalidArgumentException(sprintf('No connector found for alias "%s" in context type "%s"', $alias, $type));
+            throw new \InvalidArgumentException(
+                sprintf('No connector found for alias "%s" in context type "%s"', $alias, $type)
+            );
         }
 
         return $connectors[$type][$alias];

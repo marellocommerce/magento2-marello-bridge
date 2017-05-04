@@ -57,6 +57,5 @@ class InstallData implements InstallDataInterface
          */
         $options = ['type' => 'text', 'visible' => false, 'required' => false];
         $salesSetup->addAttribute('order', 'marello_data', $options);
-
     }
 }

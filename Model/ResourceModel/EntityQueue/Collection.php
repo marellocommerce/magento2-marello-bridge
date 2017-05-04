@@ -24,6 +24,7 @@ use Marello\Bridge\Model\ResourceModel\EntityQueue as EntityQueueResourceModel;
 
 class Collection extends AbstractCollection
 {
+    // @codingStandardsIgnoreStart
     /**
      * Define model & resource model
      */
@@ -34,4 +35,5 @@ class Collection extends AbstractCollection
             EntityQueueResourceModel::class
         );
     }
+    // @codingStandardsIgnoreEnd
 }

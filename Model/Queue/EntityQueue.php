@@ -30,6 +30,7 @@ class EntityQueue extends AbstractModel implements EntityQueueInterface, Identit
      */
     const CACHE_TAG = 'marello_entity_queue';
 
+    // @codingStandardsIgnoreStart
     /**
      * Define resource model
      */
@@ -37,69 +38,115 @@ class EntityQueue extends AbstractModel implements EntityQueueInterface, Identit
     {
         $this->_init(EntityQueueResourceModel::class);
     }
+    // @codingStandardsIgnoreEnd
 
+    /**
+     * @return array
+     */
     public function getIdentities()
     {
         return [self::CACHE_TAG . '_' . $this->getId()];
     }
 
+    /**
+     * @return mixed
+     */
     public function getMagId()
     {
         return $this->_getData(self::MAG_ID);
     }
 
+    /**
+     * @param $magId
+     * @return $this
+     */
     public function setMagId($magId)
     {
         return $this->setData(self::MAG_ID, $magId);
     }
 
+    /**
+     * @return mixed
+     */
     public function getEventType()
     {
         return $this->_getData(self::EVENT_TYPE);
     }
 
+    /**
+     * @param $eventType
+     * @return $this
+     */
     public function setEventType($eventType)
     {
         return $this->setData(self::EVENT_TYPE, $eventType);
     }
 
+    /**
+     * @return mixed
+     */
     public function getEntityData()
     {
         $entityData = unserialize($this->_getData(self::ENTITY_DATA));
         return $entityData;
     }
 
+    /**
+     * @param $entityData
+     * @return $this
+     */
     public function setEntityData($entityData)
     {
         $entityData = serialize($entityData);
         return $this->setData(self::ENTITY_DATA, $entityData);
     }
 
+    /**
+     * @return mixed
+     */
     public function getCreatedAt()
     {
         return $this->_getData(self::CREATED_AT);
     }
 
+    /**
+     * @param $createdAt
+     * @return $this
+     */
     public function setCreatedAt($createdAt)
     {
         return $this->setData(self::CREATED_AT, $createdAt);
     }
 
+    /**
+     * @return mixed
+     */
     public function getProcessedAt()
     {
         return $this->_getData(self::PROCESSED_AT);
     }
 
+    /**
+     * @param $processedAt
+     * @return $this
+     */
     public function setProcessedAt($processedAt)
     {
         return $this->setData(self::PROCESSED_AT, $processedAt);
     }
 
+    /**
+     * @return mixed
+     */
     public function getProcessed()
     {
         return $this->_getData(self::PROCESSED);
     }
 
+    /**
+     * @param $processed
+     * @return $this
+     */
     public function setProcessed($processed)
     {
         return $this->setData(self::PROCESSED, $processed);

@@ -106,28 +106,41 @@ class EntityQueueManagement implements EntityQueueManagementInterface
      */
     public function processQueue()
     {
-        $collection = $this->getQueueCollection();
-        try {
-            foreach ($collection as $queueItem) {
-                $eventType = $queueItem->getEventType();
-                $processor = null;
-                if ($eventType) {
-                    $processor = $this->getEntityProcessor($eventType);
+        $allLoaded = false;
+        $curPage = 1;
+        $i = 1;
+
+        while (!$allLoaded) {
+            $collection = $this->getQueueCollection($curPage);
+
+            if ($collection->getSize() >= $i) {
+                try {
+                    foreach ($collection as $queueItem) {
+                        $eventType = $queueItem->getEventType();
+                        $processor = null;
+                        if ($eventType) {
+                            $processor = $this->getEntityProcessor($eventType);
+                        }
+                        $entityData = $this->getEntityData($queueItem);
+                        $result = $processor->process($entityData);
+                        if ($result) {
+                            $queueItem->setProcessed(1);
+                            $queueItem->setProcessedAt(new \DateTime('now'));
+                            $this->entityQueueRepository->save($queueItem);
+                        }
+                        $i++;
+                    }
+                } catch (\Exception $e) {
+                    throw new \Magento\Framework\Exception\LocalizedException(__('Could not process Queue item'));
+                    return false;
                 }
-                $entityData = $this->getEntityData($queueItem);
-                $result = $processor->process($entityData);
-                var_dump($result);
-                if ($result) {
-                    $queueItem->setProcessed(1);
-                    $queueItem->setProcessedAt(new \DateTime('now'));
-                    $this->entityQueueRepository->save($queueItem);
-                }
+
+                $curPage++;
+            } else {
+                $allLoaded = true;
             }
-        } catch (\Exception $e) {
-            throw new \Magento\Framework\Exception\LocalizedException(__('Could not process Queue item'));
-            return false;
         }
-        
+
         return true;
     }
 

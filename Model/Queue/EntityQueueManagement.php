@@ -90,13 +90,16 @@ class EntityQueueManagement implements EntityQueueManagementInterface
 
     /**
      * {@inheritdoc}
+     * @param int $curPage
      * @return $this
      */
-    protected function getQueueCollection()
+    protected function getQueueCollection($curPage = 1)
     {
         $entityQueueCollection = $this->entityQueueFactory->create()->getCollection();
         $entityQueueCollection->addFilter('processed', ['eq' => 0]);
-        return $entityQueueCollection->setPageSize($this->getBatchSize());
+        $entityQueueCollection->setPageSize($this->getBatchSize());
+        $entityQueueCollection->setCurPage($curPage);
+        return $entityQueueCollection;
     }
 
     /**
@@ -112,7 +115,6 @@ class EntityQueueManagement implements EntityQueueManagementInterface
 
         while (!$allLoaded) {
             $collection = $this->getQueueCollection($curPage);
-
             if ($collection->getSize() >= $i) {
                 try {
                     foreach ($collection as $queueItem) {

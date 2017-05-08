@@ -24,6 +24,7 @@ use Magento\Backend\App\Area\FrontNameResolver;
 use Magento\Framework\App\State as AppState;
 
 use Marello\Bridge\Console\Command\ImportCommand;
+use Marello\Bridge\Model\Handler\ImportHandler;
 use Marello\Bridge\Model\Processor\ProductProcessor;
 
 class ImportCommandTest extends \PHPUnit_Framework_TestCase
@@ -34,8 +35,10 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
     protected $command;
 
     /**
-     * @var ProductProcessor | \PHPUnit_Framework_MockObject_MockObject
+     * @var ImportHandler | \PHPUnit_Framework_MockObject_MockObject
      */
+    protected $importHandler;
+
     protected $productProcessor;
 
     /**
@@ -49,13 +52,17 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->importHandler = $this->getMockBuilder(ImportHandler::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->productProcessor = $this->getMockBuilder(ProductProcessor::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->command = new ImportCommand(
             $this->appState,
-            $this->productProcessor
+            $this->importHandler
         );
     }
 
@@ -68,8 +75,8 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
             ->method('setAreaCode')
             ->with(FrontNameResolver::AREA_CODE);
 
-        $this->productProcessor->expects($this->once())
-            ->method('process')
+        $this->importHandler->expects($this->once())
+            ->method('handleImport')
             ->willReturn([]);
 
         $commandTester = new CommandTester($this->command);
@@ -87,13 +94,13 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
     public function testCommandExecutionWithException()
     {
         $exceptionMessage = 'Something went terribly wrong';
-        
+
         $this->appState->expects($this->once())
             ->method('setAreaCode')
             ->with(FrontNameResolver::AREA_CODE);
-        
-        $this->productProcessor->expects($this->once())
-            ->method('process')
+
+        $this->importHandler->expects($this->once())
+            ->method('handleImport')
             ->willThrowException(new \Exception($exceptionMessage));
 
         $commandTester = new CommandTester($this->command);

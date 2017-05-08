@@ -19,21 +19,17 @@
 namespace Marello\Bridge\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use Magento\Backend\App\Area\FrontNameResolver;
 use Magento\Framework\App\State as AppState;
 
-use Marello\Bridge\Model\Handler\ImportHandler;
-use Marello\Bridge\Model\Processor\Pr\oductProcessor;
+use Marello\Bridge\Model\Transport\MarelloTransportInterface;
 
-class ImportCommand extends Command
+class ApplicationStatusCommand extends Command
 {
-    const COMMAND_NAME  = 'marello:cron:import-products';
-    const IMPORT_ALIAS  = 'product';
+    const COMMAND_NAME  = 'marello:app:status';
     /**
      * Cli exit codes
      */
@@ -43,20 +39,20 @@ class ImportCommand extends Command
     /** @var AppState $appState */
     protected $appState;
 
-    /** @var ImportHandler $importHandler */
-    protected $importHandler;
+    /** @var MarelloTransportInterface $transport */
+    protected $transport;
 
     /**
      * ImportCommand constructor.
+     * @param MarelloTransportInterface $transport
      * @param AppState $appState
-     * @param ImportHandler $importHandler
      */
     public function __construct(
-        AppState $appState,
-        ImportHandler $importHandler
+        MarelloTransportInterface $transport,
+        AppState $appState
     ) {
+        $this->transport = $transport;
         $this->appState = $appState;
-        $this->importHandler = $importHandler;
         parent::__construct();
     }
 
@@ -66,7 +62,7 @@ class ImportCommand extends Command
     protected function configure()
     {
         $this->setName(self::COMMAND_NAME);
-        $this->setDescription('Import Data from Marello');
+        $this->setDescription('Check if Marello is available');
         parent::configure();
     }
 
@@ -77,26 +73,25 @@ class ImportCommand extends Command
     {
         $this->setAreaCode();
 
-        $startTime = microtime(true);
-        $output->writeln("<info>Starting Product Import</info>");
+        $output->writeln("<info>Checking Marello Application availability status</info>");
         try {
-            $this->importHandler->handleImport();
+            $this->transport->initializeTransport();
+            $result = $this->transport->getIsMarelloApiAvailable();
         } catch (\Exception $e) {
             $output->writeln("<error>{$e->getMessage()}</error>");
-            // we must have an exit code higher than zero to indicate something was wrong
-            return self::RETURN_FAILURE;
+            throw new \Exception($e->getMessage());
         }
 
-        $resultTime = microtime(true) - $startTime;
-        $output->writeln(
-            "<info>Product import has been ran successfully in ". gmdate('H:i:s', $resultTime)."</info>"
-        );
+        if ($result) {
+            $output->writeln("<info>Marello Application availability status: {$result}</info>");
+            return self::RETURN_SUCCESS;
+        }
 
-        return self::RETURN_SUCCESS;
+        return self::RETURN_FAILURE;
     }
 
     /**
-     * Check if area code is already set
+     * Set Area Code
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function setAreaCode()

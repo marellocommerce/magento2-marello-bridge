@@ -22,7 +22,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 
 use Marello\Bridge\Api\Data\ConnectorRegistryInterface;
 use Marello\Bridge\Api\Data\DataConverterRegistryInterface;
-use Marello\Bridge\Model\Transport\RestTransport;
+use Marello\Bridge\Model\Transport\MarelloTransportInterface;
 use Marello\Bridge\Model\Converter\OrderDataConverter;
 
 class NewOrderProcessor extends AbstractProcessor
@@ -37,13 +37,13 @@ class NewOrderProcessor extends AbstractProcessor
      * NewOrderProcessor constructor.
      * @param ConnectorRegistryInterface $connectorRegistry
      * @param DataConverterRegistryInterface $converterRegistry
-     * @param RestTransport $transport
+     * @param MarelloTransportInterface $transport
      * @param OrderRepositoryInterface $orderRepository
      */
     public function __construct(
         ConnectorRegistryInterface $connectorRegistry,
         DataConverterRegistryInterface $converterRegistry,
-        RestTransport $transport,
+        MarelloTransportInterface $transport,
         OrderRepositoryInterface $orderRepository
     ) {
         $this->orderRepository  = $orderRepository;

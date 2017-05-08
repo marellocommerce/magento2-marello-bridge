@@ -21,7 +21,7 @@ namespace Marello\Bridge\Model\Processor;
 use Marello\Bridge\Api\Data\DataConverterInterface;
 use Marello\Bridge\Api\Data\DataConverterRegistryInterface;
 use Marello\Bridge\Api\Data\ConnectorRegistryInterface;
-use Marello\Bridge\Model\Transport\RestTransport;
+use Marello\Bridge\Model\Transport\MarelloTransportInterface;
 
 abstract class AbstractProcessor
 {
@@ -31,19 +31,19 @@ abstract class AbstractProcessor
     /** @var DataConverterRegistryInterface $converterRegistry */
     protected $converterRegistry;
 
-    /** @var RestTransport $transport */
+    /** @var MarelloTransportInterface $transport */
     protected $transport;
 
     /**
      * AbstractProcessor constructor.
      * @param ConnectorRegistryInterface $connectorRegistry
      * @param DataConverterRegistryInterface $converterRegistry
-     * @param RestTransport $transport
+     * @param MarelloTransportInterface $transport
      */
     public function __construct(
         ConnectorRegistryInterface $connectorRegistry,
         DataConverterRegistryInterface $converterRegistry,
-        RestTransport $transport
+        MarelloTransportInterface $transport
     ) {
         $this->connectorRegistry = $connectorRegistry;
         $this->converterRegistry = $converterRegistry;
@@ -76,9 +76,7 @@ abstract class AbstractProcessor
     {
         $connectors = $this->connectorRegistry->getConnectors();
         if (!isset($connectors[$type][$alias]) && empty($connectors[$type][$alias])) {
-            throw new \InvalidArgumentException(
-                sprintf('No connector found for alias "%s" in context type "%s"', $alias, $type)
-            );
+            throw new \InvalidArgumentException(sprintf('No connector found for alias "%s" in context type "%s"', $alias, $type));
         }
 
         return $connectors[$type][$alias];

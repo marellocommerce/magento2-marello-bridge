@@ -27,6 +27,7 @@ class OrderDataConverter implements DataConverterInterface
 {
     const ORDER_CONVERSION_TYPE_NEW     = 'order_create';
     const ORDER_CONVERSION_TYPE_UPDATE  = 'order_update';
+
     /** @var Config $helper */
     protected $helper;
 

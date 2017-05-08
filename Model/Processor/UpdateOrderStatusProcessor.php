@@ -23,7 +23,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 
 use Marello\Bridge\Api\Data\DataConverterRegistryInterface;
 use Marello\Bridge\Api\Data\ConnectorRegistryInterface;
-use Marello\Bridge\Model\Transport\RestTransport;
+use Marello\Bridge\Model\Transport\MarelloTransportInterface;
 use Marello\Bridge\Model\Service\ShipmentService;
 
 class UpdateOrderStatusProcessor extends AbstractProcessor
@@ -43,7 +43,7 @@ class UpdateOrderStatusProcessor extends AbstractProcessor
      * UpdateOrderProcessor constructor.
      * @param ConnectorRegistryInterface $connectorRegistry
      * @param DataConverterRegistryInterface $converterRegistry
-     * @param RestTransport $transport
+     * @param MarelloTransportInterface $transport
      * @param OrderRepositoryInterface $orderRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param ShipmentService $shipmentService
@@ -51,7 +51,7 @@ class UpdateOrderStatusProcessor extends AbstractProcessor
     public function __construct(
         ConnectorRegistryInterface $connectorRegistry,
         DataConverterRegistryInterface $converterRegistry,
-        RestTransport $transport,
+        MarelloTransportInterface $transport,
         OrderRepositoryInterface $orderRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         ShipmentService $shipmentService

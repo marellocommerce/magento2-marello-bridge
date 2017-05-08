@@ -207,6 +207,7 @@ class RestTransport
         $this->client->setAuth($credentials);
 
         if (!$this->client->pingUsers()) {
+            var_dump($this->client->getLastRequestHeaders());
             // throw could not connect exception
             // @codingStandardsIgnoreStart
             $this->logger->alert('Could not ping the Marello instance, please check your credentials and instance, or contact your system administrator');

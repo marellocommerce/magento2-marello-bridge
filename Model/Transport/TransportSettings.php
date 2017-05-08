@@ -19,7 +19,6 @@
 namespace Marello\Bridge\Model\Transport;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Store\Model\ScopeInterface;
 
 use Marello\Bridge\Api\Data\TransportSettingsInterface;
 
@@ -43,7 +42,7 @@ class TransportSettings implements TransportSettingsInterface
      */
     public function getApiKey()
     {
-        return $this->scopeConfig->getValue(self::XML_PATH_API_KEY, ScopeInterface::SCOPE_WEBSITE);
+        return $this->scopeConfig->getValue(self::XML_PATH_API_KEY, ScopeConfigInterface::SCOPE_TYPE_DEFAULT);
     }
 
     /**
@@ -52,7 +51,7 @@ class TransportSettings implements TransportSettingsInterface
      */
     public function getApiUsername()
     {
-        return $this->scopeConfig->getValue(self::XML_PATH_API_USERNAME, ScopeInterface::SCOPE_WEBSITE);
+        return $this->scopeConfig->getValue(self::XML_PATH_API_USERNAME, ScopeConfigInterface::SCOPE_TYPE_DEFAULT);
     }
 
     /**
@@ -61,6 +60,6 @@ class TransportSettings implements TransportSettingsInterface
      */
     public function getApiUrl()
     {
-        return $this->scopeConfig->getValue(self::XML_PATH_API_URL, ScopeInterface::SCOPE_WEBSITE);
+        return $this->scopeConfig->getValue(self::XML_PATH_API_URL, ScopeConfigInterface::SCOPE_TYPE_DEFAULT);
     }
 }

@@ -18,23 +18,25 @@
  */
 namespace Marello\Bridge\Model\Converter;
 
-use Magento\Framework\App\ResourceConnection;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Attribute\Source\Status;
 
 use Marello\Bridge\Api\Data\DataConverterInterface;
 use Marello\Bridge\Helper\Config;
 
 class ProductDataConverter implements DataConverterInterface
 {
+
     const FQCN = Product::class;
 
     /** @var Config $helper */
     protected $helper;
 
-    /** @var ResourceConnection $resource */
-    protected $resource;
-
+    /**
+     * ProductDataConverter constructor.
+     * @param Config $helper
+     */
     public function __construct(Config $helper)
     {
         $this->helper = $helper;
@@ -49,6 +51,7 @@ class ProductDataConverter implements DataConverterInterface
     {
         $data = [
             'sku' => $entity->sku,
+            'name' => $entity->name,
         ];
 
         $websiteData = $this->getWebsitesIds($entity);
@@ -68,12 +71,9 @@ class ProductDataConverter implements DataConverterInterface
         $visibilityData = $this->getVisibility($entity);
         $data = array_merge($data, $visibilityData);
 
-        $saleableOnlineData = $this->getExcludedOnline($entity);
-        $data = array_merge($data, $saleableOnlineData);
+        $enabledData = $this->getStatus($entity);
+        $data = array_merge($data, $enabledData);
 
-        $saleableData = $this->getIsSaleable($entity);
-        $data = array_merge($data, $saleableData);
-        
         return $data;
     }
 
@@ -116,6 +116,10 @@ class ProductDataConverter implements DataConverterInterface
             }
         }
 
+        if (count($prices) === 0) {
+            return [];
+        }
+
         return ['prices' => $prices];
     }
 
@@ -130,17 +134,27 @@ class ProductDataConverter implements DataConverterInterface
         if (!isset($entity->channelPrices) || !property_exists($entity, 'channelPrices')) {
             return [];
         }
-
         $channelPrices = [];
         if (is_array($entity->channelPrices) && !empty($entity->channelPrices)) {
             foreach ($entity->channelPrices as $channelPrice) {
-                $websiteId = $this->helper->getWebsiteId($channelPrice->channel->code);
+                // fix for the saleschannel code not being exposed..
+                if (!property_exists($channelPrice->channel, 'code')) {
+                    continue;
+                }
 
+                $websiteId = $this->helper->getWebsiteId($channelPrice->channel->code);
+                if (!$websiteId) {
+                    continue;
+                }
                 $channelPrices[] = [
                     'website'   => $websiteId,
                     'price'     => $this->formatAmount($channelPrice->value),
                 ];
             }
+        }
+
+        if (count($channelPrices) === 0) {
+            return [];
         }
 
         return ['website_prices' => $channelPrices];
@@ -153,18 +167,21 @@ class ProductDataConverter implements DataConverterInterface
      */
     protected function getInventory($entity)
     {
-        if (!isset($entity->inventory) || !property_exists($entity, 'inventory')) {
+        if (!isset($entity->inventoryItems) || !property_exists($entity, 'inventoryItems')) {
             return [];
         }
 
         $inventory = 0;
-        if (is_array($entity->inventory)) {
-            foreach ($entity->inventory as $inventoryItem) {
+        if (is_array($entity->inventoryItems)) {
+            foreach ($entity->inventoryItems as $inventoryItem) {
                 if (!property_exists($inventoryItem, 'currentLevel')) {
                     continue;
                 }
-                // for now only one warehouse is available, so we will not have multiple inventory items
-                $inventory = $inventoryItem->currentLevel->stock;
+
+                if (is_object($inventoryItem->currentLevel)) {
+                    // for now only one warehouse is available, so we will not have multiple inventory items
+                    $inventory = $inventoryItem->currentLevel->inventory;
+                }
             }
         }
 
@@ -173,12 +190,13 @@ class ProductDataConverter implements DataConverterInterface
 
     /**
      * Get website ids based on sales channels
+     * @param $entity
      * @return mixed
      */
     protected function getWebsitesIds($entity)
     {
         if (!isset($entity->channels) || !property_exists($entity, 'channels')) {
-            return;
+            return [];
         }
 
         $websiteIds = [];
@@ -186,8 +204,10 @@ class ProductDataConverter implements DataConverterInterface
         if (is_array($entity->channels)) {
             foreach ($entity->channels as $channel) {
                 $websiteId = $this->helper->getWebsiteId($channel->code);
-                $websiteIds[] = $websiteId;
-                $storeIds[$websiteId] = $this->helper->getStoreIdsByWebsiteId($websiteId);
+                if ($websiteId !== 0) {
+                    $websiteIds[] = $websiteId;
+                    $storeIds[$websiteId] = $this->helper->getStoreIdsByWebsiteId($websiteId);
+                }
             }
             // add default store
             $storeIds[0] = [0];
@@ -202,49 +222,21 @@ class ProductDataConverter implements DataConverterInterface
     }
 
     /**
-     * Check if we need to exclude product from site
-     * @param $entity
-     * @return array
-     */
-    protected function getExcludedOnline($entity)
-    {
-        if (!property_exists($entity, 'excluded_online')) {
-            return [];
-        }
-
-        $saleable = true;
-        if ($entity->excluded_online) {
-            $saleable = false;
-        }
-
-        $storeIds   = [];
-        if (is_array($entity->channels)) {
-            foreach ($entity->channels as $channel) {
-                if (!$channel->is_online_shop) {
-                    continue;
-                }
-
-                $websiteId = $this->helper->getWebsiteId($channel->code);
-                $storeIds[$websiteId] = $this->helper->getStoreIdsByWebsiteId($websiteId);
-            }
-        }
-
-        return ['saleable_online'=> $saleable, 'saleable_stores' => $storeIds];
-    }
-
-    /**
      * Get visibility for product
+     * @SKIL_SPECIFIC
      * @param $entity
      * @return array
      */
     protected function getVisibility($entity)
     {
-        if (!property_exists($entity, 'saleable')) {
-            return [];
+        $visibility = Visibility::VISIBILITY_NOT_VISIBLE;
+
+        // visibility based on status
+        if (!property_exists($entity, 'status')) {
+            return ['visibility' => $visibility];
         }
 
-        $visibility = Visibility::VISIBILITY_IN_SEARCH;
-        if ($entity->saleable) {
+        if ($entity->status->name === 'enabled') {
             $visibility = Visibility::VISIBILITY_BOTH;
         }
 
@@ -256,12 +248,18 @@ class ProductDataConverter implements DataConverterInterface
      * @param $entity
      * @return array
      */
-    protected function getIsSaleable($entity)
+    protected function getStatus($entity)
     {
-        if (!property_exists($entity, 'saleable')) {
-            return [];
+        if (!property_exists($entity, 'status')) {
+            return ['status' => Status::STATUS_DISABLED];
         }
 
-        return ['saleable' => $entity->saleable];
+        $status = Status::STATUS_DISABLED;
+
+        if ($entity->status->name === 'enabled') {
+            $status = Status::STATUS_ENABLED;
+        }
+
+        return ['status' => $status];
     }
 }

@@ -19,74 +19,71 @@
 namespace Marello\Bridge\Model\Processor;
 
 use Marello\Bridge\Api\Data\DataConverterRegistryInterface;
-use Marello\Bridge\Api\Data\ConnectorRegistryInterface;
-use Marello\Bridge\Model\Transport\RestTransport;
-use Marello\Bridge\Model\Writer\EntityWriter;
+use Marello\Bridge\Api\Data\DataConverterInterface;
+use Marello\Bridge\Api\StrategyInterface;
 
-class ProductProcessor extends AbstractProcessor
+class ProductProcessor
 {
-    /** @var EntityWriter $writer */
-    protected $writer;
+    /** @var StrategyInterface $strategy */
+    protected $strategy;
 
-    /**
-     * ProductProcessor constructor.
-     * @param ConnectorRegistryInterface $connectorRegistry
-     * @param DataConverterRegistryInterface $converterRegistry
-     * @param RestTransport $transport
-     * @param EntityWriter $writer
-     */
+    /** @var DataConverterInterface $converter  */
+    protected $converter;
+
+    /** @var DataConverterRegistryInterface $converters */
+    protected $converters;
+
     public function __construct(
-        ConnectorRegistryInterface $connectorRegistry,
-        DataConverterRegistryInterface $converterRegistry,
-        RestTransport $transport,
-        EntityWriter $writer
+        StrategyInterface $strategy,
+        DataConverterRegistryInterface $converterRegistry
     ) {
-        $this->writer = $writer;
-        parent::__construct($connectorRegistry, $converterRegistry, $transport);
+        $this->strategy = $strategy;
+        $this->converters = $converterRegistry;
     }
 
     /**
-     * Process products for import
-     * @return $this
+     * @param $items
+     * @return array|null
      */
-    public function process()
+    public function process($items)
     {
-        $products = $this->read();
-        foreach ($products as $entity) {
-            $processedItems[] = $this->getDataConverterByAlias('product')->convertEntity($entity);
+        $this->initilialize();
+        $processedItems = [];
+
+        foreach ($items as $entity) {
+            $itemData = $this->converter->convertEntity($entity);
+            $processedItems[] = $this->strategy->process($itemData);
         }
 
-        try {
-            $this->writer->write($processedItems);
-        } catch (\Exception $e) {
-            return false;
+        if (count($processedItems) <= 0) {
+            return null;
         }
 
-        return true;
+        return $processedItems;
     }
-    
+
     /**
-     * @return array|mixed
+     * Get DataConverter Instance by alias
+     * @param string null $alias
+     * @throws \InvalidArgumentException
+     * @return DataConverterInterface
      */
-    public function read()
+    protected function getDataConverterByAlias($alias)
     {
-        $page = 1;
-        $result = true;
-        $products = [];
-        while ($result) {
-            $connector = $this->getConnectorByAlias('default', 'import');
-            $connector->setMethod('/products');
-            $this->transport->setConnector($connector);
-            $fetchResult = $this->transport->fetchEntity(['page' => $page], '/products');
-            $results = json_decode($fetchResult);
-            if (empty($results)) {
-                $results = [];
-                $result = false;
-            }
-            $products = array_merge($products, $results);
-            $page++;
+        if (!is_null($this->converter)) {
+            return $this->converter;
         }
-        
-        return $products;
+
+        $converters = $this->converters->getDataConverters();
+        if (!isset($converters[$alias]) && empty($converters[$alias])) {
+            throw new \InvalidArgumentException(sprintf('No converter found for alias "%s"', $alias));
+        }
+
+        return $converters[$alias];
+    }
+
+    protected function initilialize()
+    {
+        $this->converter = $this->getDataConverterByAlias('product');
     }
 }

@@ -13,24 +13,32 @@
  *
  * @category  Marello
  * @package   Bridge
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
 
-    <preference for="Marello\Bridge\Api\Data\TransportSettingsInterface" type="Marello\Bridge\Model\Transport\TransportSettings" />
     <preference for="Marello\Bridge\Api\Data\DataConverterRegistryInterface" type="Marello\Bridge\Model\Converter\DataConverterRegistry" />
     <preference for="Marello\Bridge\Api\Data\ConnectorRegistryInterface" type="Marello\Bridge\Model\Connector\ConnectorRegistry" />
     <preference for="Marello\Bridge\Api\EntityQueueRepositoryInterface" type="Marello\Bridge\Model\Queue\EntityQueueRepository" />
     <preference for="Marello\Bridge\Api\EntityQueueManagementInterface" type="Marello\Bridge\Model\Queue\EntityQueueManagement" />
 
+    <preference for="Marello\Bridge\Api\Data\TransportSettingsInterface" type="Marello\Bridge\Model\Transport\TransportSettings" />
+
+    <preference for="Marello\Bridge\Model\Transport\MarelloTransportInterface" type="Marello\Bridge\Model\Transport\MarelloRestTransport" />
+    <preference for="Marello\Bridge\Model\Transport\TransportClientInterface" type="Marello\Bridge\Model\Transport\TransportClient" />
+    <preference for="Marello\Bridge\Model\Transport\TransportResultHandlerInterface" type="Marello\Bridge\Model\Transport\TransportResultHandler" />
+
+    <preference for="Marello\Bridge\Api\ItemReaderInterface" type="Marello\Bridge\Model\Reader\ProductReader" />
+    <preference for="Marello\Bridge\Api\StrategyInterface" type="Marello\Bridge\Model\Strategy\ProductAddOrUpdateStrategy" />
+
     <type name="Marello\Bridge\Model\Processor\NewOrderProcessor">
         <arguments>
             <argument name="connectorRegistry" xsi:type="object">Marello\Bridge\Model\Connector\ConnectorRegistry</argument>
             <argument name="converterRegistry" xsi:type="object">Marello\Bridge\Model\Converter\DataConverterRegistry\Proxy</argument>
-            <argument name="transport" xsi:type="object">Marello\Bridge\Model\Transport\RestTransport\Proxy</argument>
+            <argument name="transport" xsi:type="object">Marello\Bridge\Model\Transport\MarelloRestTransport\Proxy</argument>
         </arguments>
     </type>
 
@@ -38,7 +46,7 @@
         <arguments>
             <argument name="connectorRegistry" xsi:type="object">Marello\Bridge\Model\Connector\ConnectorRegistry</argument>
             <argument name="converterRegistry" xsi:type="object">Marello\Bridge\Model\Converter\DataConverterRegistry\Proxy</argument>
-            <argument name="transport" xsi:type="object">Marello\Bridge\Model\Transport\RestTransport\Proxy</argument>
+            <argument name="transport" xsi:type="object">Marello\Bridge\Model\Transport\MarelloRestTransport\Proxy</argument>
         </arguments>
     </type>
 
@@ -47,15 +55,6 @@
             <argument name="orderConverter" xsi:type="object">Magento\Sales\Model\Convert\Order\Proxy</argument>
             <argument name="dbTransaction" xsi:type="object">Magento\Framework\DB\Transaction</argument>
             <argument name="orderGrid" xsi:type="object">MarelloOrderIndexGridSyncInsert</argument>
-        </arguments>
-    </type>
-
-    <type name="Marello\Bridge\Model\Processor\ProductProcessor">
-        <arguments>
-            <argument name="connectorRegistry" xsi:type="object">Marello\Bridge\Model\Connector\ConnectorRegistry</argument>
-            <argument name="converterRegistry" xsi:type="object">Marello\Bridge\Model\Converter\DataConverterRegistry\Proxy</argument>
-            <argument name="transport" xsi:type="object">Marello\Bridge\Model\Transport\RestTransport\Proxy</argument>
-            <argument name="writer" xsi:type="object">Marello\Bridge\Model\Writer\EntityWriter\Proxy</argument>
         </arguments>
     </type>
 
@@ -99,6 +98,7 @@
     <type name="Marello\Bridge\Model\Processor\ProcessorRegistry">
         <arguments>
             <argument name="processors" xsi:type="array">
+                <item name="product" xsi:type="object">Marello\Bridge\Model\Processor\ProductProcessor</item>
                 <item name="order_create" xsi:type="object">Marello\Bridge\Model\Processor\NewOrderProcessor</item>
                 <item name="order_invoice" xsi:type="object">Marello\Bridge\Model\Processor\UpdateOrderProcessor</item>
                 <item name="order_cancel" xsi:type="object">Marello\Bridge\Model\Processor\UpdateOrderProcessor</item>
@@ -132,9 +132,16 @@
         </arguments>
     </type>
 
+    <type name="Marello\Bridge\Observer\CreateReturn">
+        <arguments>
+            <argument name="entityQueueRepository" xsi:type="object">Marello\Bridge\Model\Queue\EntityQueueRepository\Proxy</argument>
+        </arguments>
+    </type>
+
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
+                <item name="marello:app:status" xsi:type="object">Marello\Bridge\Console\Command\ApplicationStatusCommand</item>
                 <item name="marello:cron:import-products" xsi:type="object">Marello\Bridge\Console\Command\ImportCommand</item>
                 <item name="marello:cron:update-orders" xsi:type="object">Marello\Bridge\Console\Command\OrderUpdateCommand</item>
             </argument>

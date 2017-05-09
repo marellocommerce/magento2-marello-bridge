@@ -20,5 +20,5 @@ namespace Marello\Bridge\Model\Processor;
 
 interface MarelloProcessorInterface
 {
-    public function process($item = null);
+    public function process($items);
 }

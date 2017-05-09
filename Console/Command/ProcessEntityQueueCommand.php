@@ -25,11 +25,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Magento\Backend\App\Area\FrontNameResolver;
 use Magento\Framework\App\State as AppState;
 
-use Marello\Bridge\Model\Transport\MarelloTransportInterface;
+use Marello\Bridge\Api\EntityQueueManagementInterface;
 
-class ApplicationStatusCommand extends Command
+class ProcessEntityQueueCommand extends Command
 {
-    const COMMAND_NAME  = 'marello:app:status';
+    const COMMAND_NAME  = 'marello:cron:process-queue';
+
     /**
      * Cli exit codes
      */
@@ -39,20 +40,20 @@ class ApplicationStatusCommand extends Command
     /** @var AppState $appState */
     protected $appState;
 
-    /** @var MarelloTransportInterface $transport */
-    protected $transport;
+    /** @var EntityQueueManagementInterface $entityQueueManagement */
+    protected $entityQueueManagement;
 
     /**
-     * ImportCommand constructor.
-     * @param MarelloTransportInterface $transport
+     * ProcessEntityQueueCommand constructor.
      * @param AppState $appState
+     * @param EntityQueueManagementInterface $entityQueueManagement
      */
     public function __construct(
-        MarelloTransportInterface $transport,
-        AppState $appState
+        AppState $appState,
+        EntityQueueManagementInterface $entityQueueManagement
     ) {
-        $this->transport = $transport;
         $this->appState = $appState;
+        $this->entityQueueManagement = $entityQueueManagement;
         parent::__construct();
     }
 
@@ -62,7 +63,7 @@ class ApplicationStatusCommand extends Command
     protected function configure()
     {
         $this->setName(self::COMMAND_NAME);
-        $this->setDescription('Check if Marello is available');
+        $this->setDescription('Process the EntityQueue in order to send data to Marello');
         parent::configure();
     }
 
@@ -73,26 +74,26 @@ class ApplicationStatusCommand extends Command
     {
         $this->setAreaCode();
 
-        $output->writeln("<info>Checking Marello Application availability status</info>");
+        $startTime = microtime(true);
+        $output->writeln("<info>Starting processing Queue</info>");
         try {
-            $result = $this->transport->getIsMarelloApiAvailable();
-//            var_dump($this->transport->getLastResponse());
-//            var_dump($this->transport->getRequestHeaders());
+            $this->entityQueueManagement->processQueue();
         } catch (\Exception $e) {
             $output->writeln("<error>{$e->getMessage()}</error>");
-            throw new \Exception($e->getMessage());
+            // we must have an exit code higher than zero to indicate something was wrong
+            return self::RETURN_FAILURE;
         }
 
-        if ($result) {
-            $output->writeln("<info>Marello Application availability status: {$result}</info>");
-            return self::RETURN_SUCCESS;
-        }
+        $resultTime = microtime(true) - $startTime;
+        $output->writeln(
+            "<info>Queue has been ran successfully in ". gmdate('H:i:s', $resultTime)."</info>"
+        );
 
-        return self::RETURN_FAILURE;
+        return self::RETURN_SUCCESS;
     }
 
     /**
-     * Set Area Code
+     * Check if area code is already set
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function setAreaCode()

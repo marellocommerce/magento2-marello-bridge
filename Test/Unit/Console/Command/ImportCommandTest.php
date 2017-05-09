@@ -94,11 +94,11 @@ class ImportCommandTest extends \PHPUnit_Framework_TestCase
     public function testCommandExecutionWithException()
     {
         $exceptionMessage = 'Something went terribly wrong';
-
+        
         $this->appState->expects($this->once())
             ->method('setAreaCode')
             ->with(FrontNameResolver::AREA_CODE);
-
+        
         $this->importHandler->expects($this->once())
             ->method('handleImport')
             ->willThrowException(new \Exception($exceptionMessage));

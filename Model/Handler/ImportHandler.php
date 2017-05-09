@@ -143,7 +143,6 @@ class ImportHandler
 
     /**
      * {@inheritdoc}
-     * initialize processor
      */
     protected function initialize()
     {

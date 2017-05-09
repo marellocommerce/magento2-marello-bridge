@@ -35,6 +35,9 @@ class MarelloRestTransport implements MarelloTransportInterface
     /** @var TransportResultHandlerInterface $resultHandler */
     protected $resultHandler;
 
+    /** @var bool $isTransportInitialized  */
+    protected $isTransportInitialized = false;
+
     /**
      * RestTransport constructor.
      * @param TransportSettingsInterface $settings
@@ -80,14 +83,7 @@ class MarelloRestTransport implements MarelloTransportInterface
         $credentials['api_key'] = $this->settings->getApiKey();
         $this->client->configure($url, $credentials);
 
-        if (!$this->getIsMarelloApiAvailable()) {
-            // throw could not connect exception
-            // @codingStandardsIgnoreStart
-            $this->resultHandler->handleResponse($this->client->getLastResponse(), $this->client->getResponseCode(), $this->client->getRequestHeaders());
-            throw new \Exception('Could not ping the Marello instance, please check your credentials and instance, or contact your system administrator');
-
-            // @codingStandardsIgnoreEnd
-        }
+        $this->isTransportInitialized = true;
     }
 
     public function getTransportSettings()
@@ -101,8 +97,21 @@ class MarelloRestTransport implements MarelloTransportInterface
 
     public function call($action, $params = [])
     {
+        if (!$this->isTransportInitialized) {
+            $this->initializeTransport();
+        }
+
         if (!$this->client) {
             throw new \Exception("REST Transport is not configured properly.");
+        }
+
+        if (!$this->getIsMarelloApiAvailable()) {
+            // throw could not connect exception
+            // @codingStandardsIgnoreStart
+            $this->resultHandler->handleResponse($this->client->getLastResponse(), $this->client->getResponseCode(), $this->client->getRequestHeaders());
+            throw new \Exception('Could not ping the Marello instance, please check your credentials and instance, or contact your system administrator');
+
+            // @codingStandardsIgnoreEnd
         }
 
         try {
@@ -110,7 +119,7 @@ class MarelloRestTransport implements MarelloTransportInterface
             $result = $this->client->restCall($action, $connector->getType(), $params);
         } catch (\Exception $e) {
             // TODO proper error handling
-            throw new \Exception('Oopsie daisy something went terribly wrong');
+            throw new \Exception($e->getMessage());
         }
         $this->resultHandler->handleResponse($this->client->getLastResponse(), $this->client->getResponseCode(), $this->client->getRequestHeaders());
         $this->resultHandler->logResult(TransportResultHandlerInterface::DEBUG, print_r($result, true));
@@ -123,6 +132,20 @@ class MarelloRestTransport implements MarelloTransportInterface
      */
     public function getIsMarelloApiAvailable()
     {
+        if (!$this->isTransportInitialized) {
+            $this->initializeTransport();
+        }
+
         return $this->client->isMarelloApiAvailable();
+    }
+
+    public function getLastResponse()
+    {
+        return $this->client->getLastResponse();
+    }
+
+    public function getRequestHeaders()
+    {
+        return $this->client->getRequestHeaders();
     }
 }

@@ -114,7 +114,7 @@
         </arguments>
     </type>
 
-    <type name="Marello\Bridge\Observer\CreateOrder">
+    <type name="Marello\Bridge\Observer\CreateEntityQueueOnOrderCreateObserver">
         <arguments>
             <argument name="entityQueueRepository" xsi:type="object">Marello\Bridge\Model\Queue\EntityQueueRepository\Proxy</argument>
         </arguments>
@@ -132,18 +132,13 @@
         </arguments>
     </type>
 
-    <type name="Marello\Bridge\Observer\CreateReturn">
-        <arguments>
-            <argument name="entityQueueRepository" xsi:type="object">Marello\Bridge\Model\Queue\EntityQueueRepository\Proxy</argument>
-        </arguments>
-    </type>
-
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
             <argument name="commands" xsi:type="array">
                 <item name="marello:app:status" xsi:type="object">Marello\Bridge\Console\Command\ApplicationStatusCommand</item>
                 <item name="marello:cron:import-products" xsi:type="object">Marello\Bridge\Console\Command\ImportCommand</item>
                 <item name="marello:cron:update-orders" xsi:type="object">Marello\Bridge\Console\Command\OrderUpdateCommand</item>
+                <item name="marello:cron:process-queue" xsi:type="object">Marello\Bridge\Console\Command\ProcessEntityQueueCommand</item>
             </argument>
         </arguments>
     </type>

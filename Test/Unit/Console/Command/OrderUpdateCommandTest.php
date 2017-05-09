@@ -42,10 +42,7 @@ class OrderUpdateCommandTest extends \PHPUnit_Framework_TestCase
      * @var AppState | \PHPUnit_Framework_MockObject_MockObject
      */
     protected $appState;
-
-    /**
-     * {@inheritdoc}
-     */
+    
     protected function setUp()
     {
         $this->appState = $this->getMockBuilder(AppState::class)
@@ -107,4 +104,5 @@ class OrderUpdateCommandTest extends \PHPUnit_Framework_TestCase
             $commandTester->getDisplay()
         );
     }
+
 }

@@ -22,7 +22,7 @@ use Marello\Bridge\Api\Data\DataConverterRegistryInterface;
 use Marello\Bridge\Api\Data\DataConverterInterface;
 use Marello\Bridge\Api\StrategyInterface;
 
-class ProductProcessor
+class ProductProcessor implements MarelloProcessorInterface
 {
     /** @var StrategyInterface $strategy */
     protected $strategy;
@@ -47,7 +47,7 @@ class ProductProcessor
      */
     public function process($items)
     {
-        $this->initilialize();
+        $this->initialize();
         $processedItems = [];
 
         foreach ($items as $entity) {
@@ -82,7 +82,10 @@ class ProductProcessor
         return $converters[$alias];
     }
 
-    protected function initilialize()
+    /**
+     * {@inheritdoc}
+     */
+    protected function initialize()
     {
         $this->converter = $this->getDataConverterByAlias('product');
     }

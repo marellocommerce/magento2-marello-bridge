@@ -56,7 +56,6 @@ class ProductReader implements ItemReaderInterface
         $products = [];
         $connector = $this->getConnectorByAlias('default', 'import');
         $connector->setMethod('/products');
-        $this->transport->initializeTransport();
         $this->transport->setConnector($connector);
         while ($this->result) {
             $result = $this->transport->call('/products', ['page' => $page, 'limit' => 10]);

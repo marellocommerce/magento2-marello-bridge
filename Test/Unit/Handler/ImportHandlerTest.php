@@ -16,7 +16,7 @@
  * @copyright Copyright 2016 Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
-namespace Marello\Bridge\Test\Unit\Model\Handler;
+namespace Marello\Bridge\Test\Unit\Handler;
 
 use Marello\Bridge\Model\Handler\ImportHandler;
 use Marello\Bridge\Api\ItemReaderInterface;

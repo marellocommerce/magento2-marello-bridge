@@ -133,6 +133,7 @@ class EntityQueueManagement implements EntityQueueManagementInterface
                         $i++;
                     }
                 } catch (\Exception $e) {
+                    var_dump($e->getMessage());
                     throw new \Magento\Framework\Exception\LocalizedException(__('Could not process Queue item'));
                     return false;
                 }

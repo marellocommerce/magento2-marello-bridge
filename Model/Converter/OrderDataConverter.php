@@ -70,14 +70,15 @@ class OrderDataConverter implements DataConverterInterface
         $data = [
             'orderReference'  => $reference,
             'salesChannel'    => $salesChannel,
-            'currency'        => $order->getOrderCurrencyCode(),
+            'currency'        => 'EUR',//$order->getOrderCurrencyCode(),
             'subtotal'        => $this->formatAmount($order->getSubtotal()),
             'totalTax'        => $this->formatAmount($order->getTaxAmount()),
             'grandTotal'      => $this->formatAmount($order->getGrandTotal()),
             'discountAmount'  => $order->getDiscountAmount(),
             'couponCode'      => $order->getCouponCode(),
             'shippingMethod'  => $shippingMethod,
-            'shippingAmount'  => $shippingAmount,
+            'shippingAmountExclTax'  => $shippingAmount,
+            'shippingAmountInclTax'  => $shippingAmount,
             'paymentMethod'   => $paymentMethod,
             'paymentDetails'  => $paymentDetails,
         ];
@@ -141,13 +142,15 @@ class OrderDataConverter implements DataConverterInterface
             $purchasePriceIncl  = $_item->getPriceInclTax();
             $rowTotal           = ($_item->getRowTotalInclTax()) ? $_item->getRowTotalInclTax() : $_item->getRowTotal();
 
-            $data['quantity']           = (int)$_item->getQtyOrdered();
-            $data['price']              = $this->formatAmount($price);
-            $data['originalPrice']      = $this->formatAmount($orgPrice);
-            $data['purchasePriceIncl']  = $this->formatAmount($purchasePriceIncl);
-            $data['tax']                = $this->formatAmount($_item->getTaxAmount());
-            $data['taxPercent']         = ($_item->getTaxPercent() / 100);
-            $data['rowTotal']           = $this->formatAmount($rowTotal);
+            $data['quantity']               = (int)$_item->getQtyOrdered();
+            $data['originalPriceInclTax']   = $this->formatAmount($orgPrice);
+            $data['originalPriceExclTax']   = $this->formatAmount($purchasePriceIncl);
+            $data['purchasePriceIncl']      = $this->formatAmount($purchasePriceIncl);
+            $data['price']                  = $this->formatAmount($price);
+            $data['tax']                    = $this->formatAmount($_item->getTaxAmount());
+            $data['taxPercent']             = ($_item->getTaxPercent() / 100);
+            $data['rowTotalInclTax']        = $this->formatAmount($rowTotal);
+            $data['rowTotalExclTax']        = $this->formatAmount($rowTotal);
 
             $itemData[] = $data;
         }

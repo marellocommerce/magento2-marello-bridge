@@ -58,19 +58,21 @@ class NewOrderProcessor extends AbstractProcessor
     public function process(array $orderData)
     {
         $order = $orderData['order'];
-        // check if customer exists
-        // apparently we can only get a full list of customers -.-'
         $existingCustomer = $this->findExistingCustomer($order->getCustomerEmail());
 
         if (null === $existingCustomer) {
-            $this->processCustomer($order);
+            $result = $this->processCustomer($order);
+            if ($result->getData('error')) {
+                //we couldn't send the customer data successfully to Marello instance
+                return false;
+            }
             $existingCustomer = $this->findExistingCustomer($order->getCustomerEmail());
         }
-        
+
         if (!$order->getData('marello_data')) {
-            $result = $this->syncOrder($order, $existingCustomer);
-            if (strpos($result, 'The requested URL') === false) {
-                $this->saveOrderData($result, $order);
+            $result = $this->syncOrder($order, $existingCustomer->customer);
+            if (!$result->getData('error')) {
+                $this->saveOrderData($result->getData('body'), $order);
                 return true;
             }
         }
@@ -88,7 +90,7 @@ class NewOrderProcessor extends AbstractProcessor
         $converter = $this->getDataConverterByAlias('customer');
         $convertedCustomer = $converter->convertEntity($order);
         $this->setTransportConnector('customer');
-        return $this->transport->synchronizeEntity($convertedCustomer);
+        return $this->transport->call('/customers', $convertedCustomer);
     }
 
     /**
@@ -105,8 +107,7 @@ class NewOrderProcessor extends AbstractProcessor
         // merge customer and order data
         $convertedOrder['customer'] = $customer->id;
         $this->setTransportConnector('order');
-
-        return $this->transport->synchronizeEntity($convertedOrder);
+        return $this->transport->call('/orders', $convertedOrder);
     }
 
     /**
@@ -152,15 +153,17 @@ class NewOrderProcessor extends AbstractProcessor
      * @param $email
      * @return mixed|null
      */
-    protected function findExistingCustomer($email)
+    public function findExistingCustomer($email)
     {
+        $connector = $this->getConnectorByAlias('default', 'export');
+        $connector->setMethod('/customers/getcustomerbyemail');
+        $this->transport->setConnector($connector);
+        $result = $this->transport->call('/customers/getcustomerbyemail', ['email' => $email]);
+        $fetchResult = $result->getData('body');
+        $result = json_decode($fetchResult);
         $existingCustomer = null;
-        $decodedResult = $this->fetchCustomers();
-        foreach ($decodedResult as $customer) {
-            if ($customer->email === $email) {
-                $existingCustomer = $customer;
-                break;
-            }
+        if ($result) {
+            $existingCustomer = $result;
         }
 
         return $existingCustomer;

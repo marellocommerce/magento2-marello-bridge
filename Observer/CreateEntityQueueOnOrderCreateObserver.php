@@ -18,41 +18,48 @@
  */
 namespace Marello\Bridge\Observer;
 
+use Psr\Log\LoggerInterface;
+
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Sales\Model\Order;
 
 use Marello\Bridge\Model\Queue\EntityQueueFactory;
-use Marello\Bridge\Model\Queue\EntityQueueRepository;
 use Marello\Bridge\Api\EntityQueueRepositoryInterface;
 use Marello\Bridge\Model\Queue\QueueEventTypeInterface;
 use Marello\Bridge\Helper\Config;
 
-class CreateOrder implements ObserverInterface
+class CreateEntityQueueOnOrderCreateObserver implements ObserverInterface
 {
     /** @var EntityQueueFactory $entityQueueFactory */
     protected $entityQueueFactory;
 
-    /** @var EntityQueueRepository $entityQueueRepository */
+    /** @var EntityQueueRepositoryInterface $entityQueueRepository */
     protected $entityQueueRepository;
 
     /** @var Config $helper */
     protected $helper;
 
+    /** @var LoggerInterface $logger */
+    protected $logger;
+
     /**
-     * UpdateOrder constructor.
+     * {@inheritdoc}
      * @param EntityQueueFactory                $entityQueueFactory
      * @param EntityQueueRepositoryInterface    $entityQueueRepository
      * @param Config                            $helper
+     * @param LoggerInterface                   $logger
      */
     public function __construct(
         EntityQueueFactory $entityQueueFactory,
         EntityQueueRepositoryInterface $entityQueueRepository,
-        Config $helper
+        Config $helper,
+        LoggerInterface $logger
     ) {
         $this->entityQueueFactory       = $entityQueueFactory;
         $this->entityQueueRepository    = $entityQueueRepository;
         $this->helper                   = $helper;
+        $this->logger                   = $logger;
     }
 
     /**
@@ -89,6 +96,7 @@ class CreateOrder implements ObserverInterface
             $queueEnitity->setProcessedAt(null);
             $this->entityQueueRepository->save($queueEnitity);
         } catch (\Exception $e) {
+            $this->logger->log('critical', $e->getMessage(), $e->getTrace());
             throw new \Exception($e->getMessage());
         }
 

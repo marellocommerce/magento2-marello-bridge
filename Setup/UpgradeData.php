@@ -23,6 +23,7 @@ use Magento\Framework\Setup\UpgradeDataInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\DB\Ddl\Table;
+use Magento\Setup\Module\Dependency\Report\Circular\Data\Module;
 
 class UpgradeData implements UpgradeDataInterface
 {
@@ -38,6 +39,12 @@ class UpgradeData implements UpgradeDataInterface
             && version_compare($context->getVersion(), '1.0.1', '<')
         ) {
             $this->upgrade101($setup);
+        }
+
+        if ($context->getVersion()
+            && version_compare($context->getVersion(), '1.1.1', '<')
+        ) {
+            $this->upgrade111($setup);
         }
 
         $setup->endSetup();
@@ -61,6 +68,22 @@ class UpgradeData implements UpgradeDataInterface
                 'comment' => 'Marello Export Status'
             ]
         );
+
+        $installer->endSetup();
+    }
+
+    /**
+     * {@inheritdoc}
+     * @param ModuleDataSetupInterface $setup
+     */
+    public function upgrade111(ModuleDataSetupInterface $setup)
+    {
+        $installer = $setup;
+        $installer->startSetup();
+        $columnExists = $installer->getConnection()->tableColumnExists('sales_order_grid', 'marello_export_status');
+        if (!$columnExists) {
+            $this->upgrade101($setup);
+        }
 
         $installer->endSetup();
     }

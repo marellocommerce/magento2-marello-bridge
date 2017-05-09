@@ -71,15 +71,21 @@ class UpdateOrderProcessor extends AbstractProcessor
         
         // get all the order info
         $marelloOrderId = $data->id;
-        $orderResult = $this->transport->fetchEntity(['id' => $marelloOrderId], '/orders');
+        $this->setTransportConnector('default');
+        $this->transport->getConnector()->setType('get');
+        $orderResult = $this->transport->call('/orders', ['id' => $marelloOrderId]);
+        $fetchResult = $orderResult->getData('body');
+        $decodedResult = json_decode($fetchResult);
 
-        $decodedResult = json_decode($orderResult);
-        $workFlowItemId = $decodedResult->workflowItem->id;
+        if (is_array($decodedResult->workflowItems)) {
+            $workFlowItemId = $decodedResult->workflowItems[0]->id;
+        }
+
         $transition = $this->getWorkflowTransition($orderData['type']);
         $transitWorkflowResult = $this->transitOrder($workFlowItemId, $transition);
 
-        if (strpos($transitWorkflowResult, 'The requested URL') === false && null !== $transitWorkflowResult) {
-            $this->saveOrderData($orderResult, $order);
+        if (!$transitWorkflowResult->getData('error')) {
+            $this->saveOrderData($orderResult->getData('body'), $order);
             if ($transition === self::TRANSITION_TYPE_CANCELED) {
                 return true;
             }
@@ -94,7 +100,7 @@ class UpdateOrderProcessor extends AbstractProcessor
             }
             // order is invoiced, directly prepare for ship it.
             $transitWorkflowResult = $this->transitOrder($workFlowItemId, self::TRANSITION_TYPE_PICKPACK);
-            if (strpos($transitWorkflowResult, 'The requested URL') === false && null !== $transitWorkflowResult) {
+            if ($transitWorkflowResult->getData('error') && null !== $transitWorkflowResult) {
                 $this->saveOrderData($orderResult, $order);
                 return true;
             }
@@ -125,9 +131,7 @@ class UpdateOrderProcessor extends AbstractProcessor
 
         $this->setTransportConnector('default');
         $this->transport->getConnector()->setType('put');
-        $this->transport->getConnector()->setMethod(sprintf('/orders/%s', $marelloOrderId));
-
-        return $this->transport->synchronizeEntity($orderData);
+        return $this->transport->call(sprintf('/orders/%s', $marelloOrderId), $orderData);
     }
 
     /**
@@ -140,13 +144,7 @@ class UpdateOrderProcessor extends AbstractProcessor
     {
         $this->setTransportConnector('default');
         $this->transport->getConnector()->setType('get');
-        $this->transport->getConnector()->setMethod('/workflow/transit');
-
-        $item = [
-            'workflowItemId' => sprintf('%s/%s', $workflowItemId, $transition)
-        ];
-
-        return $this->transport->synchronizeEntity($item);
+        return $this->transport->call(sprintf('/workflow/transit/%s/%s', $workflowItemId, $transition));
     }
 
     /**

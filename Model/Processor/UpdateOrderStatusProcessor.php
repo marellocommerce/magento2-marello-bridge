@@ -96,14 +96,24 @@ class UpdateOrderStatusProcessor extends AbstractProcessor
             }
 
             // get all the order info from Marello
-            $marelloOrderData = $this->transport->fetchEntity(['id' => $marelloOrderData->id], '/orders');
-            if (strpos($marelloOrderData, 'The requested URL') !== false && null !== $marelloOrderData) {
+            $this->setTransportConnector('default');
+            $this->transport->getConnector()->setType('get');
+            $marelloOrderData = $this->transport->call('/orders', ['id' => $marelloOrderData->id]);
+            if (!$marelloOrderData->getData('error') && null === $marelloOrderData) {
                 continue;
             }
 
-            $marelloOrderData = json_decode($marelloOrderData);
+            $marelloOrderData = json_decode($marelloOrderData->getData('body'));
 
-            if ($marelloOrderData->workflowStep->name === self::WORKFLOW_STEP_NAME_SHIPPED) {
+            $workFlowItem = null;
+            if (is_array($marelloOrderData->workflowItems)) {
+                $workFlowItem = $marelloOrderData->workflowItems[0];
+            }
+
+            if (!property_exists($workFlowItem->currentStep, 'name')) {
+                continue;
+            }
+            if ($workFlowItem->currentStep->name === self::WORKFLOW_STEP_NAME_SHIPPED) {
                 // create shipment
                 $this->shipmentService->createShipment($order);
             }

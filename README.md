@@ -11,12 +11,9 @@ implementation of certain classes. More on extending and configuring own process
 **Features include:**
 - Send orders
 - Send order updates
-- Send rma's (Magento EE only)
-- Queued processing of orders && rma's
+- Queued processing of entities
 - Import products from Marello
 - Update orders in Magento (including creation of shipments)
 - Configure Marello connection settings through backend
 - Ping Marello application (for availability of application)
 
-**Features include:**
-Currently Magento 2 version tested with Queue implementation: Magento 2 (EE) 2.1.2

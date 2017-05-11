@@ -112,7 +112,7 @@
         </arguments>
     </type>
 
-    <type name="Marello\Bridge\Observer\CreateEntityQueueOnOrderCreateObserver">
+    <type name="Marello\Bridge\Observer\CreateEntityQueueOnOrderCreate">
         <arguments>
             <argument name="entityQueueRepository" xsi:type="object">Marello\Bridge\Model\Queue\EntityQueueRepository\Proxy</argument>
         </arguments>

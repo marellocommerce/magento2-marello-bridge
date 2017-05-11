@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Marello
  *
@@ -26,13 +25,13 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Framework\Event;
 
-use Marello\Bridge\Observer\CreateEntityQueueOnOrderCreateObserver;
+use Marello\Bridge\Observer\CreateEntityQueueOnOrderCancel;
 use Marello\Bridge\Model\Queue\EntityQueueFactory;
 use Marello\Bridge\Api\EntityQueueRepositoryInterface;
 use Marello\Bridge\Api\Data\EntityQueueInterface;
 use Marello\Bridge\Helper\Config;
 
-class AddEntityQueueOnOrderCreationObserverTest extends \PHPUnit_Framework_TestCase
+class AddEntityQueueOnOrderCancelTest extends \PHPUnit_Framework_TestCase
 {
     /** @var Observer $eventObserverMock */
     protected $eventObserverMock;
@@ -46,7 +45,7 @@ class AddEntityQueueOnOrderCreationObserverTest extends \PHPUnit_Framework_TestC
     /** @var Config $configurationHelperMock */
     protected $configurationHelperMock;
 
-    /** @var CreateEntityQueueOnOrderCreateObserver $unit */
+    /** @var CreateEntityQueueOnOrderCreate $unit */
     protected $unit;
 
     /** @var LoggerInterface $loggerMock */
@@ -84,7 +83,7 @@ class AddEntityQueueOnOrderCreationObserverTest extends \PHPUnit_Framework_TestC
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->unit = new CreateEntityQueueOnOrderCreateObserver(
+        $this->unit = new CreateEntityQueueOnOrderCancel(
             $this->entityQueueFactoryMock,
             $this->entityQueueRepositoryMock,
             $this->configurationHelperMock,
@@ -101,7 +100,7 @@ class AddEntityQueueOnOrderCreationObserverTest extends \PHPUnit_Framework_TestC
             ->method('isBridgeEnabled')
             ->willReturn(true);
 
-        $orderMock = $this->getMockBuilder(OrderInterface::class)
+        $orderMock = $this->getMockBuilder(Order::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -124,8 +123,8 @@ class AddEntityQueueOnOrderCreationObserverTest extends \PHPUnit_Framework_TestC
             ->willReturn($orderMock);
 
         $orderMock->expects($this->once())
-            ->method('getState')
-            ->willReturn(Order::STATE_NEW);
+            ->method('isCanceled')
+            ->willReturn(true);
 
         $this->entityQueueFactoryMock
             ->expects($this->once())

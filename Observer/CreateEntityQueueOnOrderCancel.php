@@ -18,51 +18,42 @@
  */
 namespace Marello\Bridge\Observer;
 
-use Psr\Log\LoggerInterface;
-
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Model\Order;
 
 use Marello\Bridge\Model\Queue\EntityQueueFactory;
+use Marello\Bridge\Model\Queue\EntityQueueRepository;
 use Marello\Bridge\Api\EntityQueueRepositoryInterface;
 use Marello\Bridge\Model\Queue\QueueEventTypeInterface;
 use Marello\Bridge\Helper\Config;
 
-class CreateEntityQueueOnOrderCreateObserver implements ObserverInterface
+class CreateEntityQueueOnOrderCancel implements ObserverInterface
 {
     /** @var EntityQueueFactory $entityQueueFactory */
     protected $entityQueueFactory;
 
-    /** @var EntityQueueRepositoryInterface $entityQueueRepository */
+    /** @var EntityQueueRepository $entityQueueRepository */
     protected $entityQueueRepository;
 
     /** @var Config $helper */
     protected $helper;
 
-    /** @var LoggerInterface $logger */
-    protected $logger;
-
     /**
-     * {@inheritdoc}
+     * UpdateOrder constructor.
      * @param EntityQueueFactory                $entityQueueFactory
      * @param EntityQueueRepositoryInterface    $entityQueueRepository
      * @param Config                            $helper
-     * @param LoggerInterface                   $logger
      */
     public function __construct(
         EntityQueueFactory $entityQueueFactory,
         EntityQueueRepositoryInterface $entityQueueRepository,
-        Config $helper,
-        LoggerInterface $logger
+        Config $helper
     ) {
         $this->entityQueueFactory       = $entityQueueFactory;
         $this->entityQueueRepository    = $entityQueueRepository;
         $this->helper                   = $helper;
-        $this->logger                   = $logger;
     }
-
     /**
      * @param Observer $observer
      * @return $this
@@ -73,16 +64,17 @@ class CreateEntityQueueOnOrderCreateObserver implements ObserverInterface
         if (!$this->helper->isBridgeEnabled()) {
             return $this;
         }
-        
+
+        /** @var OrderInterface $order */
         $order = $observer->getEvent()->getOrder();
-        if (!$this->isNewOrder($order)) {
+        if (!$order->isCanceled()) {
             return $this;
         }
 
         try {
             $result = $this->entityQueueRepository->findOneByIdAndEventType(
-                $order->getEntityId(),
-                QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_CREATE
+                $order->getId(),
+                QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_CANCEL
             );
 
             if ($result) {
@@ -91,25 +83,13 @@ class CreateEntityQueueOnOrderCreateObserver implements ObserverInterface
 
             $queueEnitity = $this->entityQueueFactory->create();
             $queueEnitity->setMagId($order->getEntityId());
-            $queueEnitity->setEventType(QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_CREATE);
+            $queueEnitity->setEventType(QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_CANCEL);
             $queueEnitity->setEntityData(['entityAlias' => 'order', 'entityClass' => get_class($order)]);
             $queueEnitity->setProcessed(0);
             $queueEnitity->setProcessedAt(null);
             $this->entityQueueRepository->save($queueEnitity);
         } catch (\Exception $e) {
-            $this->logger->log('critical', $e->getMessage(), $e->getTrace());
+            throw new \Exception($e->getMessage());
         }
-
-        return $this;
-    }
-
-    /**
-     * Check if an order is new via state.
-     * @param OrderInterface $order
-     * @return bool
-     */
-    protected function isNewOrder(OrderInterface $order)
-    {
-        return (bool) ($order->getState() === Order::STATE_NEW);
     }
 }

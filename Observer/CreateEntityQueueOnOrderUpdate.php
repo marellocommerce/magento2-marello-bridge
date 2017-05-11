@@ -21,6 +21,7 @@ namespace Marello\Bridge\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Model\Order;
 
 use Marello\Bridge\Model\Queue\EntityQueueFactory;
 use Marello\Bridge\Model\Queue\EntityQueueRepository;
@@ -28,7 +29,7 @@ use Marello\Bridge\Api\EntityQueueRepositoryInterface;
 use Marello\Bridge\Model\Queue\QueueEventTypeInterface;
 use Marello\Bridge\Helper\Config;
 
-class CancelOrder implements ObserverInterface
+class CreateEntityQueueOnOrderUpdate implements ObserverInterface
 {
     /** @var EntityQueueFactory $entityQueueFactory */
     protected $entityQueueFactory;
@@ -54,6 +55,7 @@ class CancelOrder implements ObserverInterface
         $this->entityQueueRepository    = $entityQueueRepository;
         $this->helper                   = $helper;
     }
+
     /**
      * @param Observer $observer
      * @return $this
@@ -67,14 +69,18 @@ class CancelOrder implements ObserverInterface
 
         /** @var OrderInterface $order */
         $order = $observer->getEvent()->getOrder();
-        if (!$order->isCanceled()) {
+        if (!$this->isProcessedOrder($order)) {
+            return $this;
+        }
+
+        if (!$order->hasInvoices() && $this->isCompleteOrder($order)) {
             return $this;
         }
 
         try {
             $result = $this->entityQueueRepository->findOneByIdAndEventType(
-                $order->getId(),
-                QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_CANCEL
+                $order->getEntityId(),
+                QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_INVOICE
             );
 
             if ($result) {
@@ -83,7 +89,7 @@ class CancelOrder implements ObserverInterface
 
             $queueEnitity = $this->entityQueueFactory->create();
             $queueEnitity->setMagId($order->getEntityId());
-            $queueEnitity->setEventType(QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_CANCEL);
+            $queueEnitity->setEventType(QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_INVOICE);
             $queueEnitity->setEntityData(['entityAlias' => 'order', 'entityClass' => get_class($order)]);
             $queueEnitity->setProcessed(0);
             $queueEnitity->setProcessedAt(null);
@@ -91,5 +97,25 @@ class CancelOrder implements ObserverInterface
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
+    }
+
+    /**
+     * Check if an order is processed via state.
+     * @param OrderInterface $order
+     * @return bool
+     */
+    protected function isProcessedOrder(OrderInterface $order)
+    {
+        return (bool) ($order->getState() === Order::STATE_PROCESSING);
+    }
+
+    /**
+     * Check if an order is complete via state.
+     * @param OrderInterface $order
+     * @return bool
+     */
+    protected function isCompleteOrder(OrderInterface $order)
+    {
+        return (bool) ($order->getState() === Order::STATE_COMPLETE);
     }
 }

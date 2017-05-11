@@ -18,42 +18,49 @@
  */
 namespace Marello\Bridge\Observer;
 
+use Psr\Log\LoggerInterface;
+
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 
 use Marello\Bridge\Model\Queue\EntityQueueFactory;
-use Marello\Bridge\Model\Queue\EntityQueueRepository;
 use Marello\Bridge\Api\EntityQueueRepositoryInterface;
 use Marello\Bridge\Model\Queue\QueueEventTypeInterface;
 use Marello\Bridge\Helper\Config;
 
-class UpdateOrder implements ObserverInterface
+class CreateEntityQueueOnOrderCreate implements ObserverInterface
 {
     /** @var EntityQueueFactory $entityQueueFactory */
     protected $entityQueueFactory;
 
-    /** @var EntityQueueRepository $entityQueueRepository */
+    /** @var EntityQueueRepositoryInterface $entityQueueRepository */
     protected $entityQueueRepository;
 
     /** @var Config $helper */
     protected $helper;
 
+    /** @var LoggerInterface $logger */
+    protected $logger;
+
     /**
-     * UpdateOrder constructor.
+     * {@inheritdoc}
      * @param EntityQueueFactory                $entityQueueFactory
      * @param EntityQueueRepositoryInterface    $entityQueueRepository
      * @param Config                            $helper
+     * @param LoggerInterface                   $logger
      */
     public function __construct(
         EntityQueueFactory $entityQueueFactory,
         EntityQueueRepositoryInterface $entityQueueRepository,
-        Config $helper
+        Config $helper,
+        LoggerInterface $logger
     ) {
         $this->entityQueueFactory       = $entityQueueFactory;
         $this->entityQueueRepository    = $entityQueueRepository;
         $this->helper                   = $helper;
+        $this->logger                   = $logger;
     }
 
     /**
@@ -66,21 +73,16 @@ class UpdateOrder implements ObserverInterface
         if (!$this->helper->isBridgeEnabled()) {
             return $this;
         }
-
-        /** @var OrderInterface $order */
+        
         $order = $observer->getEvent()->getOrder();
-        if (!$this->isProcessedOrder($order)) {
-            return $this;
-        }
-
-        if (!$order->hasInvoices() && !$this->isCompleteOrder($order)) {
+        if (!$this->isNewOrder($order)) {
             return $this;
         }
 
         try {
             $result = $this->entityQueueRepository->findOneByIdAndEventType(
                 $order->getEntityId(),
-                QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_INVOICE
+                QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_CREATE
             );
 
             if ($result) {
@@ -89,33 +91,25 @@ class UpdateOrder implements ObserverInterface
 
             $queueEnitity = $this->entityQueueFactory->create();
             $queueEnitity->setMagId($order->getEntityId());
-            $queueEnitity->setEventType(QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_INVOICE);
+            $queueEnitity->setEventType(QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_CREATE);
             $queueEnitity->setEntityData(['entityAlias' => 'order', 'entityClass' => get_class($order)]);
             $queueEnitity->setProcessed(0);
             $queueEnitity->setProcessedAt(null);
             $this->entityQueueRepository->save($queueEnitity);
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+            $this->logger->log('critical', $e->getMessage(), $e->getTrace());
         }
+
+        return $this;
     }
 
     /**
-     * Check if an order is processed via state.
+     * Check if an order is new via state.
      * @param OrderInterface $order
      * @return bool
      */
-    protected function isProcessedOrder(OrderInterface $order)
+    protected function isNewOrder(OrderInterface $order)
     {
-        return (bool) ($order->getState() === Order::STATE_PROCESSING);
-    }
-
-    /**
-     * Check if an order is complete via state.
-     * @param OrderInterface $order
-     * @return bool
-     */
-    protected function isCompleteOrder(OrderInterface $order)
-    {
-        return (bool) ($order->getState() === Order::STATE_COMPLETE);
+        return (bool) ($order->getState() === Order::STATE_NEW);
     }
 }

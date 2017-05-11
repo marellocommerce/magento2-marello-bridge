@@ -18,6 +18,7 @@
 namespace Marello\Bridge\Model\Transport;
 
 use Marello\Api\Client;
+use Marello\Bridge\Api\TransportClientInterface;
 
 class TransportClient implements TransportClientInterface
 {
@@ -36,7 +37,7 @@ class TransportClient implements TransportClientInterface
      */
     public function configure($url, $params = [])
     {
-        $this->client = $this->createNewClient($url);
+        $this->client = $this->createClient($url);
         $this->client->setAuth($params);
     }
 
@@ -154,7 +155,7 @@ class TransportClient implements TransportClientInterface
      * @param $url
      * @return Client
      */
-    public function createNewClient($url)
+    private function createClient($url)
     {
         return new Client($url);
     }

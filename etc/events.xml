@@ -19,8 +19,8 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="sales_order_save_after">
-        <observer name="marello_bridge_sync_create_order" instance="Marello\Bridge\Observer\CreateEntityQueueOnOrderCreateObserver" />
-        <observer name="marello_bridge_sync_update_order" instance="Marello\Bridge\Observer\UpdateOrder" />
-        <observer name="marello_bridge_sync_cancel_order" instance="Marello\Bridge\Observer\CancelOrder" />
+        <observer name="marello_bridge_sync_create_order" instance="Marello\Bridge\Observer\CreateEntityQueueOnOrderCreate" />
+        <observer name="marello_bridge_sync_update_order" instance="Marello\Bridge\Observer\CreateEntityQueueOnOrderUpdate" />
+        <observer name="marello_bridge_sync_cancel_order" instance="Marello\Bridge\Observer\CreateEntityQueueOnOrderCancel" />
     </event>
 </config>

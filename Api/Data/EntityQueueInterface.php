@@ -13,7 +13,7 @@
  *
  * @category  Marello
  * @package   Bridge
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Marello\Bridge\Api\Data;
@@ -54,28 +54,70 @@ interface EntityQueueInterface
      * @return $this
      */
     public function setId($id);
-    
+
+    /**
+     * @return mixed
+     */
     public function getMagId();
-    
+
+    /**
+     * @param $magId
+     * @return mixed
+     */
     public function setMagId($magId);
-    
+
+    /**
+     * @return mixed
+     */
     public function getEventType();
-    
+
+    /**
+     * @param $eventType
+     * @return mixed
+     */
     public function setEventType($eventType);
-    
+
+    /**
+     * @return mixed
+     */
     public function getEntityData();
-    
+
+    /**
+     * @param $entityData
+     * @return mixed
+     */
     public function setEntityData($entityData);
-    
+
+    /**
+     * @return mixed
+     */
     public function getCreatedAt();
-    
+
+    /**
+     * @param $createdAt
+     * @return mixed
+     */
     public function setCreatedAt($createdAt);
-    
+
+    /**
+     * @return mixed
+     */
     public function getProcessedAt();
-    
+
+    /**
+     * @param $processedAt
+     * @return mixed
+     */
     public function setProcessedAt($processedAt);
-    
+
+    /**
+     * @return mixed
+     */
     public function getProcessed();
-    
+
+    /**
+     * @param $processed
+     * @return mixed
+     */
     public function setProcessed($processed);
 }

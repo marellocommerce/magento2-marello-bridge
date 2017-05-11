@@ -22,15 +22,13 @@
 
     <preference for="Marello\Bridge\Api\Data\DataConverterRegistryInterface" type="Marello\Bridge\Model\Converter\DataConverterRegistry" />
     <preference for="Marello\Bridge\Api\Data\ConnectorRegistryInterface" type="Marello\Bridge\Model\Connector\ConnectorRegistry" />
-    <preference for="Marello\Bridge\Api\EntityQueueRepositoryInterface" type="Marello\Bridge\Model\Queue\EntityQueueRepository" />
-    <preference for="Marello\Bridge\Api\EntityQueueManagementInterface" type="Marello\Bridge\Model\Queue\EntityQueueManagement" />
-
     <preference for="Marello\Bridge\Api\Data\TransportSettingsInterface" type="Marello\Bridge\Model\Transport\TransportSettings" />
 
-    <preference for="Marello\Bridge\Model\Transport\MarelloTransportInterface" type="Marello\Bridge\Model\Transport\MarelloRestTransport" />
-    <preference for="Marello\Bridge\Model\Transport\TransportClientInterface" type="Marello\Bridge\Model\Transport\TransportClient" />
-    <preference for="Marello\Bridge\Model\Transport\TransportResultHandlerInterface" type="Marello\Bridge\Model\Transport\TransportResultHandler" />
-
+    <preference for="Marello\Bridge\Api\EntityQueueRepositoryInterface" type="Marello\Bridge\Model\Queue\EntityQueueRepository" />
+    <preference for="Marello\Bridge\Api\EntityQueueManagementInterface" type="Marello\Bridge\Model\Queue\EntityQueueManagement" />
+    <preference for="Marello\Bridge\Api\MarelloTransportInterface" type="Marello\Bridge\Model\Transport\MarelloRestTransport" />
+    <preference for="Marello\Bridge\Api\TransportClientInterface" type="Marello\Bridge\Model\Transport\TransportClient" />
+    <preference for="Marello\Bridge\Api\TransportResultHandlerInterface" type="Marello\Bridge\Model\Transport\TransportResultHandler" />
     <preference for="Marello\Bridge\Api\ItemReaderInterface" type="Marello\Bridge\Model\Reader\ProductReader" />
     <preference for="Marello\Bridge\Api\StrategyInterface" type="Marello\Bridge\Model\Strategy\ProductAddOrUpdateStrategy" />
 

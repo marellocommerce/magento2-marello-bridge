@@ -13,48 +13,52 @@
  *
  * @category  Marello
  * @package   Bridge
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Marello\Bridge\Helper;
 
-use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\EntityManager\MetadataPool;
+use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Framework\EntityManager\EntityMetadataInterface;
 
 class EntityIdentifierHelper
 {
-    const AFFECTED_MAGENTO_VERSION = '2.1.0';
-
-    /** @var ProductMetadataInterface $productMetadata */
-    protected $productMetaData;
+    /** @var MetadataPool $metadataPool */
+    private $metadataPool;
 
     /**
-     * @param ProductMetadataInterface $productMetadata
+     * @param MetadataPool $metadataPool
      */
-    public function __construct(ProductMetadataInterface $productMetadata)
-    {
-        $this->productMetaData = $productMetadata;
+    public function __construct(
+        MetadataPool $metadataPool
+    ) {
+        $this->metadataPool = $metadataPool;
     }
 
     /**
-     * {@inheritdoc}
+     * Get Product Entity Identifier field
+     * @return string
      */
     public function getEntityIdentifier()
     {
-        $identifier = 'entity_id';
-        $version = $this->getMagentoVersion();
-        if (version_compare($version, self::AFFECTED_MAGENTO_VERSION, '>')) {
-            $identifier = 'row_id';
-        }
-
-        return $identifier;
+        return $this->getProductMetaData()->getIdentifierField();
     }
 
     /**
-     * Get magento version
+     * Get link field for product
      * @return string
      */
-    public function getMagentoVersion()
+    public function getProductLinkField()
     {
-        return $this->productMetaData->getVersion();
+        return $this->getProductMetaData()->getLinkField();
+    }
+
+    /**
+     * @return EntityMetadataInterface
+     */
+    public function getProductMetaData()
+    {
+        return $this->metadataPool->getMetadata(ProductInterface::class);
     }
 }

@@ -12,7 +12,7 @@
  *
  * @category  Marello
  * @package   Bridge
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Marello\Bridge\Test\Integration\Stub;
@@ -129,7 +129,7 @@ class TransportClientMock extends TransportClient
         return;
     }
 
-    private function createNewClient($url)
+    public function createNewClient($url)
     {
         return new \stdClass();
     }

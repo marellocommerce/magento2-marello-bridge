@@ -13,7 +13,7 @@
  *
  * @category  Marello
  * @package   Bridge
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Marello\Bridge\Model\Queue;
@@ -133,8 +133,7 @@ class EntityQueueManagement implements EntityQueueManagementInterface
                         $i++;
                     }
                 } catch (\Exception $e) {
-                    var_dump($e->getMessage());
-                    throw new \Magento\Framework\Exception\LocalizedException(__('Could not process Queue item'));
+                    throw new \Exception($e->getMessage());
                     return false;
                 }
 

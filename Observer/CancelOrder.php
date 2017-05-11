@@ -13,14 +13,14 @@
  *
  * @category  Marello
  * @package   Bridge
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Marello\Bridge\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
-use Magento\Sales\Model\Order;
+use Magento\Sales\Api\Data\OrderInterface;
 
 use Marello\Bridge\Model\Queue\EntityQueueFactory;
 use Marello\Bridge\Model\Queue\EntityQueueRepository;
@@ -65,7 +65,7 @@ class CancelOrder implements ObserverInterface
             return $this;
         }
 
-        /** @var Order $order */
+        /** @var OrderInterface $order */
         $order = $observer->getEvent()->getOrder();
         if (!$order->isCanceled()) {
             return $this;
@@ -82,7 +82,7 @@ class CancelOrder implements ObserverInterface
             }
 
             $queueEnitity = $this->entityQueueFactory->create();
-            $queueEnitity->setMagId($order->getId());
+            $queueEnitity->setMagId($order->getEntityId());
             $queueEnitity->setEventType(QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_CANCEL);
             $queueEnitity->setEntityData(['entityAlias' => 'order', 'entityClass' => get_class($order)]);
             $queueEnitity->setProcessed(0);

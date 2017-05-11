@@ -13,12 +13,13 @@
  *
  * @category  Marello
  * @package   Bridge
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Marello\Bridge\Model\Transport;
 
 use Psr\Log\LoggerInterface;
+use Marello\Bridge\Api\TransportResultHandlerInterface;
 
 class TransportResultHandler implements TransportResultHandlerInterface
 {
@@ -39,6 +40,7 @@ class TransportResultHandler implements TransportResultHandlerInterface
      * @param $result
      * @param $responseCode
      * @param array $params
+     * @return void
      */
     public function handleResponse($result, $responseCode, $params = [])
     {
@@ -92,10 +94,10 @@ class TransportResultHandler implements TransportResultHandlerInterface
     }
 
     /**
-     * Log the result of the response/result
      * @param $level
      * @param $message
-     * @param $context
+     * @param array $context
+     * @return void
      */
     public function logResult($level, $message, $context = [])
     {

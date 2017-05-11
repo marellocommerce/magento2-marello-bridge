@@ -13,7 +13,7 @@
  *
  * @category  Marello
  * @package   Bridge
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Marello\Bridge\Observer;
@@ -22,6 +22,7 @@ use Psr\Log\LoggerInterface;
 
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 
 use Marello\Bridge\Model\Queue\EntityQueueFactory;
@@ -80,7 +81,7 @@ class CreateEntityQueueOnOrderCreateObserver implements ObserverInterface
 
         try {
             $result = $this->entityQueueRepository->findOneByIdAndEventType(
-                $order->getId(),
+                $order->getEntityId(),
                 QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_CREATE
             );
 
@@ -89,7 +90,7 @@ class CreateEntityQueueOnOrderCreateObserver implements ObserverInterface
             }
 
             $queueEnitity = $this->entityQueueFactory->create();
-            $queueEnitity->setMagId($order->getId());
+            $queueEnitity->setMagId($order->getEntityId());
             $queueEnitity->setEventType(QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_CREATE);
             $queueEnitity->setEntityData(['entityAlias' => 'order', 'entityClass' => get_class($order)]);
             $queueEnitity->setProcessed(0);
@@ -97,7 +98,6 @@ class CreateEntityQueueOnOrderCreateObserver implements ObserverInterface
             $this->entityQueueRepository->save($queueEnitity);
         } catch (\Exception $e) {
             $this->logger->log('critical', $e->getMessage(), $e->getTrace());
-            throw new \Exception($e->getMessage());
         }
 
         return $this;
@@ -105,10 +105,10 @@ class CreateEntityQueueOnOrderCreateObserver implements ObserverInterface
 
     /**
      * Check if an order is new via state.
-     * @param Order $order
+     * @param OrderInterface $order
      * @return bool
      */
-    protected function isNewOrder(Order $order)
+    protected function isNewOrder(OrderInterface $order)
     {
         return (bool) ($order->getState() === Order::STATE_NEW);
     }

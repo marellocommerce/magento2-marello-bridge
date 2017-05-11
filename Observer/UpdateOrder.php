@@ -13,13 +13,14 @@
  *
  * @category  Marello
  * @package   Bridge
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Marello\Bridge\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 
 use Marello\Bridge\Model\Queue\EntityQueueFactory;
@@ -66,7 +67,7 @@ class UpdateOrder implements ObserverInterface
             return $this;
         }
 
-        /** @var Order $order */
+        /** @var OrderInterface $order */
         $order = $observer->getEvent()->getOrder();
         if (!$this->isProcessedOrder($order)) {
             return $this;
@@ -78,7 +79,7 @@ class UpdateOrder implements ObserverInterface
 
         try {
             $result = $this->entityQueueRepository->findOneByIdAndEventType(
-                $order->getId(),
+                $order->getEntityId(),
                 QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_INVOICE
             );
 
@@ -87,7 +88,7 @@ class UpdateOrder implements ObserverInterface
             }
 
             $queueEnitity = $this->entityQueueFactory->create();
-            $queueEnitity->setMagId($order->getId());
+            $queueEnitity->setMagId($order->getEntityId());
             $queueEnitity->setEventType(QueueEventTypeInterface::QUEUE_EVENT_TYPE_ORDER_INVOICE);
             $queueEnitity->setEntityData(['entityAlias' => 'order', 'entityClass' => get_class($order)]);
             $queueEnitity->setProcessed(0);
@@ -100,20 +101,20 @@ class UpdateOrder implements ObserverInterface
 
     /**
      * Check if an order is processed via state.
-     * @param Order $order
+     * @param OrderInterface $order
      * @return bool
      */
-    protected function isProcessedOrder(Order $order)
+    protected function isProcessedOrder(OrderInterface $order)
     {
         return (bool) ($order->getState() === Order::STATE_PROCESSING);
     }
 
     /**
      * Check if an order is complete via state.
-     * @param Order $order
+     * @param OrderInterface $order
      * @return bool
      */
-    protected function isCompleteOrder(Order $order)
+    protected function isCompleteOrder(OrderInterface $order)
     {
         return (bool) ($order->getState() === Order::STATE_COMPLETE);
     }

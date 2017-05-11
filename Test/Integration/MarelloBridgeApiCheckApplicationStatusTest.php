@@ -11,7 +11,7 @@
  * to license@marello.com so we can send you a copy immediately
  *
  * @package   Marello
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Marello\Bridge\Test\Integration;
@@ -24,7 +24,7 @@ use Magento\TestFramework\Helper\Bootstrap;
 
 use Marello\Bridge\Test\Integration\Stub\TransportClientMock;
 use Marello\Bridge\Console\Command\ApplicationStatusCommand;
-use Marello\Bridge\Model\Transport\TransportClientInterface;
+use Marello\Bridge\Api\TransportClientInterface;
 
 class MarelloBridgeApiCheckApplicationStatusTest extends \PHPUnit_Framework_TestCase
 {

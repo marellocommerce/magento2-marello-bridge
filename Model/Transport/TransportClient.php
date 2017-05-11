@@ -12,7 +12,7 @@
  *
  * @category  Marello
  * @package   Bridge
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Marello\Bridge\Model\Transport;
@@ -29,6 +29,11 @@ class TransportClient implements TransportClientInterface
     /** @var Client $client */
     protected $client;
 
+    /**
+     * {@inheritdoc}
+     * @param $url
+     * @param array $params
+     */
     public function configure($url, $params = [])
     {
         $this->client = $this->createNewClient($url);
@@ -36,6 +41,7 @@ class TransportClient implements TransportClientInterface
     }
 
     /**
+     * {@inheritdoc}
      * @return bool
      */
     public function isMarelloApiAvailable()
@@ -43,6 +49,13 @@ class TransportClient implements TransportClientInterface
         return $this->client->pingUsers();
     }
 
+    /**
+     * {@inheritdoc}
+     * @param $path
+     * @param string $type
+     * @param array $query
+     * @return mixed
+     */
     public function restCall($path, $type = 'get', array $query = [])
     {
         switch ($type) :
@@ -65,42 +78,83 @@ class TransportClient implements TransportClientInterface
         return $result;
     }
 
+    /**
+     * {@inheritdoc}
+     * @param $path
+     * @param $query
+     * @return mixed
+     */
     protected function restGetCall($path, $query)
     {
         return $this->client->restGet($path, $query);
     }
 
+    /**
+     * {@inheritdoc}
+     * @param $path
+     * @param $query
+     * @return mixed
+     */
     protected function restPostCall($path, $query)
     {
         return $this->client->restPost($path, $query);
     }
 
+    /**
+     * {@inheritdoc}
+     * @param $path
+     * @param $query
+     * @return mixed
+     */
     protected function restPutCall($path, $query)
     {
         return $this->client->restPut($path, $query);
     }
 
+    /**
+     * {@inheritdoc}
+     * @param $path
+     * @param $query
+     * @return mixed
+     */
     protected function restDeleteCall($path, $query)
     {
         return $this->client->restDelete($path, $query);
     }
 
+    /**
+     * {@inheritdoc}
+     * @return mixed
+     */
     public function getResponseCode()
     {
         return $this->client->getResponseCode();
     }
 
+    /**
+     * {@inheritdoc}
+     * @return mixed
+     */
     public function getLastResponse()
     {
         return $this->client->getLastResponse();
     }
 
+    /**
+     * {@inheritdoc}
+     * @return mixed
+     */
     public function getRequestHeaders()
     {
         return $this->client->getLastRequestHeaders();
     }
 
-    private function createNewClient($url)
+    /**
+     * {@inheritdoc}
+     * @param $url
+     * @return Client
+     */
+    public function createNewClient($url)
     {
         return new Client($url);
     }

@@ -13,7 +13,7 @@
  *
  * @category  Marello
  * @package   Bridge
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Marello\Bridge\Model\Processor;
@@ -21,7 +21,7 @@ namespace Marello\Bridge\Model\Processor;
 use Marello\Bridge\Api\Data\DataConverterInterface;
 use Marello\Bridge\Api\Data\DataConverterRegistryInterface;
 use Marello\Bridge\Api\Data\ConnectorRegistryInterface;
-use Marello\Bridge\Model\Transport\MarelloTransportInterface;
+use Marello\Bridge\Api\MarelloTransportInterface;
 
 abstract class AbstractProcessor
 {

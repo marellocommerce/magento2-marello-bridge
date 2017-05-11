@@ -13,7 +13,7 @@
  *
  * @category  Marello
  * @package   Api
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Marello\Bridge\Api\Data;
@@ -26,9 +26,18 @@ interface TransportSettingsInterface extends ExtensibleDataInterface
     const XML_PATH_API_URL      = 'marellobridgesettings/general/api_url';
     const XML_PATH_API_USERNAME = 'marellobridgesettings/general/api_username';
 
+    /**
+     * @return string
+     */
     public function getApiKey();
 
+    /**
+     * @return string
+     */
     public function getApiUsername();
 
+    /**
+     * @return string
+     */
     public function getApiUrl();
 }

@@ -13,7 +13,7 @@
  *
  * @category  Marello
  * @package   Bridge
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Marello\Bridge\Model\Processor;
@@ -22,7 +22,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 
 use Marello\Bridge\Api\Data\ConnectorRegistryInterface;
 use Marello\Bridge\Api\Data\DataConverterRegistryInterface;
-use Marello\Bridge\Model\Transport\MarelloTransportInterface;
+use Marello\Bridge\Api\MarelloTransportInterface;
 use Marello\Bridge\Model\Queue\QueueEventTypeInterface;
 use Marello\Bridge\Model\Converter\OrderDataConverter;
 
@@ -76,6 +76,10 @@ class UpdateOrderProcessor extends AbstractProcessor
         $orderResult = $this->transport->call('/orders', ['id' => $marelloOrderId]);
         $fetchResult = $orderResult->getData('body');
         $decodedResult = json_decode($fetchResult);
+
+        if (!$decodedResult || !property_exists($decodedResult, 'workflowItems')) {
+            return false;
+        }
 
         if (is_array($decodedResult->workflowItems)) {
             $workFlowItemId = $decodedResult->workflowItems[0]->id;

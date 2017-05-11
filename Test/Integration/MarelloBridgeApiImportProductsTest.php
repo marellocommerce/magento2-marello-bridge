@@ -11,7 +11,7 @@
  * to license@marello.com so we can send you a copy immediately
  *
  * @package   Marello
- * @copyright Copyright 2016 Marello (http://www.marello.com)
+ * @copyright Copyright Marello (http://www.marello.com)
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 namespace Marello\Bridge\Test\Integration;
@@ -35,7 +35,7 @@ use Magento\Framework\App\ResourceConnection;
 use Marello\Bridge\Console\Command\ImportCommand;
 use Marello\Bridge\Model\Writer\Attribute\DefaultAttributeWriter;
 use Marello\Bridge\Test\Integration\Stub\TransportClientMock;
-use Marello\Bridge\Model\Transport\TransportClientInterface;
+use Marello\Bridge\Api\TransportClientInterface;
 
 /**
  * Class MarelloBridgeApiImportProductsTest
@@ -149,12 +149,6 @@ class MarelloBridgeApiImportProductsTest extends \PHPUnit_Framework_TestCase
         // check websites
         $websiteIds = $product->getWebsiteIds();
         $this->assertEquals([0 => 1, 0 => '0'], $websiteIds);
-
-        // check stock item data
-//        $item = $this->stockRegistry->getStockItem($product->getId(), 1);
-//        $stockItem = $this->stockRepository->get($item->getItemId());
-//        $this->assertEquals(150, $stockItem->getQty(), 'Product Should end with a total stock of 150');
-
         $this->assertEquals(ImportCommand::RETURN_SUCCESS, $result);
 
         $this->resetTransportClient();
@@ -215,17 +209,6 @@ class MarelloBridgeApiImportProductsTest extends \PHPUnit_Framework_TestCase
         // check websites
         $websiteIds = $product->getWebsiteIds();
         $this->assertEquals([0 => 1, 0 => '0'], $websiteIds);
-
-        for ($i=10; $i <= 0; $i++) {
-            var_dump($i);
-            var_dump('sleepie sleepie');
-            sleep(1);
-        }
-        // check stock item data
-        $item = $this->stockRegistry->getStockItemBySku($product->getSku());
-        $stockItem = $this->stockRepository->get($item->getStockId());
-        $this->assertEquals(150, $stockItem->getQty(), 'Product Should end with a total stock of 150');
-
         $this->assertEquals(ImportCommand::RETURN_SUCCESS, $result);
 
         $this->resetTransportClient();
@@ -283,11 +266,17 @@ class MarelloBridgeApiImportProductsTest extends \PHPUnit_Framework_TestCase
         include __DIR__ . '/_files/simple_product.php';
     }
 
+    /**
+     * {@inheritdoc]
+     */
     public static function loadConfigFixture()
     {
         include __DIR__ . '/_files/module-config.php';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public static function loadConfigAndProductFixture()
     {
         self::loadConfigFixture();

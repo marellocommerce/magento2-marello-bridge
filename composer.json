@@ -11,7 +11,7 @@
     "require": {
         "php": ">=5.5.0",
         "magento/framework": "100.1.*",
-        "marellocommerce/marello-bridge-api": "1.0.*"
+        "marellocommerce/marello-bridge-api": "1.1.*"
     },
     "type": "magento2-module",
     "license": [

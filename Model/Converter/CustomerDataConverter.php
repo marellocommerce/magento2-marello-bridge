@@ -88,7 +88,8 @@ class CustomerDataConverter implements DataConverterInterface
         ];
 
         if (!$order->getCustomerIsGuest()) {
-            $customer = $this->customerRepository->get($order->getCustomerEmail());
+            $websiteId = $order->getStore()->getWebsite()->getId();
+            $customer = $this->customerRepository->get($order->getCustomerEmail(), $websiteId);
             $data['firstName'] = $customer->getFirstname();
             $data['lastName'] = $customer->getLastname();
             $data['email'] = $customer->getEmail();

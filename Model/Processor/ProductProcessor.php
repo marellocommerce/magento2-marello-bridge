@@ -21,6 +21,7 @@ namespace Marello\Bridge\Model\Processor;
 use Marello\Bridge\Api\Data\DataConverterRegistryInterface;
 use Marello\Bridge\Api\Data\DataConverterInterface;
 use Marello\Bridge\Api\StrategyInterface;
+use Marello\Bridge\Api\MarelloProcessorInterface;
 
 class ProductProcessor implements MarelloProcessorInterface
 {

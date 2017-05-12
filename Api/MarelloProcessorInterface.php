@@ -16,9 +16,13 @@
  * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
  */
 
-namespace Marello\Bridge\Model\Processor;
+namespace Marello\Bridge\Api;
 
 interface MarelloProcessorInterface
 {
+    /**
+     * @param $items
+     * @return mixed
+     */
     public function process($items);
 }

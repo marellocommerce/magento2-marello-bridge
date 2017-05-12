@@ -65,9 +65,10 @@ class UpdateOrderStatusProcessor extends AbstractProcessor
 
     /**
      * Process updated order data
+     * @param $items
      * @return $this
      */
-    public function process()
+    public function process($items)
     {
         $criteria = $this->searchCriteriaBuilder
             ->addFilter('status', 'processing')

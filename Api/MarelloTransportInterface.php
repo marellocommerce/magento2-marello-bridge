@@ -19,11 +19,26 @@ namespace Marello\Bridge\Api;
 
 interface MarelloTransportInterface
 {
+    /**
+     * {@inheritdoc}
+     * @return void
+     */
     public function initializeTransport();
 
+    /**
+     * @return array
+     */
     public function getTransportSettings();
 
+    /**
+     * @param $action
+     * @param array $params
+     * @return mixed
+     */
     public function call($action, $params = []);
 
+    /**
+     * @return bool
+     */
     public function getIsMarelloApiAvailable();
 }

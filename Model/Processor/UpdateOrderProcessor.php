@@ -59,8 +59,12 @@ class UpdateOrderProcessor extends AbstractProcessor
      * @return $this
      * @throws \Exception
      */
-    public function process(array $orderData)
+    public function process($orderData)
     {
+        if (!is_array($orderData)) {
+            return false;
+        }
+
         $order = $orderData['order'];
         $jsonData = unserialize($order->getData('marello_data'));
         $data = json_decode($jsonData);

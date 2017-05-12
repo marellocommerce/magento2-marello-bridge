@@ -55,8 +55,12 @@ class NewOrderProcessor extends AbstractProcessor
      * @param array $orderData
      * @return $this
      */
-    public function process(array $orderData)
+    public function process($orderData)
     {
+        if (!is_array($orderData)) {
+            return false;
+        }
+
         $order = $orderData['order'];
         $existingCustomer = $this->findExistingCustomer($order->getCustomerEmail());
 

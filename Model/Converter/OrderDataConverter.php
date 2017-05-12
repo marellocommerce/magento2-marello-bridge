@@ -63,24 +63,25 @@ class OrderDataConverter implements DataConverterInterface
         $paymentDetails  = $this->getPaymentDetails($order->getPayment());
 
         $shippingMethod = $order->getShippingDescription();
+        $baseShippingAmount = $order->getShippingAmount();
         $shippingAmount = $order->getShippingAmount();
 
         // basic order data
         // customer is added at a later stage
         $data = [
-            'orderReference'  => $reference,
-            'salesChannel'    => $salesChannel,
-            'currency'        => 'EUR',//$order->getOrderCurrencyCode(),
-            'subtotal'        => $this->formatAmount($order->getSubtotal()),
-            'totalTax'        => $this->formatAmount($order->getTaxAmount()),
-            'grandTotal'      => $this->formatAmount($order->getGrandTotal()),
-            'discountAmount'  => $order->getDiscountAmount(),
-            'couponCode'      => $order->getCouponCode(),
-            'shippingMethod'  => $shippingMethod,
-            'shippingAmountExclTax'  => $shippingAmount,
-            'shippingAmountInclTax'  => $shippingAmount,
-            'paymentMethod'   => $paymentMethod,
-            'paymentDetails'  => $paymentDetails,
+            'orderReference'        => $reference,
+            'salesChannel'          => $salesChannel,
+            'currency'              => $order->getOrderCurrencyCode(),
+            'subtotal'              => $this->formatAmount($order->getSubtotal()),
+            'totalTax'              => $this->formatAmount($order->getTaxAmount()),
+            'grandTotal'            => $this->formatAmount($order->getGrandTotal()),
+            'discountAmount'        => $order->getDiscountAmount(),
+            'couponCode'            => $order->getCouponCode(),
+            'shippingMethod'        => $shippingMethod,
+            'shippingAmountExclTax' => $baseShippingAmount,
+            'shippingAmountInclTax' => $shippingAmount,
+            'paymentMethod'         => $paymentMethod,
+            'paymentDetails'        => $paymentDetails,
         ];
 
         // add addtional data such as payment reference, invoice date and invoice ref number
@@ -138,19 +139,21 @@ class OrderDataConverter implements DataConverterInterface
             }
 
             $price              = $_item->getBasePrice();
-            $orgPrice           = $_item->getBaseOriginalPrice();
+            $orgPrice           = $_item->getOriginalPrice();
+            $baseOrgPrice       = $_item->getBaseOriginalPrice();
             $purchasePriceIncl  = $_item->getPriceInclTax();
-            $rowTotal           = ($_item->getRowTotalInclTax()) ? $_item->getRowTotalInclTax() : $_item->getRowTotal();
+            $rowTotalIncl       = ($_item->getRowTotalInclTax()) ? $_item->getRowTotalInclTax() : $_item->getRowTotal();
+            $rowTotalExcl       = $_item->getRowTotal();
 
             $data['quantity']               = (int)$_item->getQtyOrdered();
-            $data['originalPriceInclTax']   = $this->formatAmount($orgPrice);
-            $data['originalPriceExclTax']   = $this->formatAmount($purchasePriceIncl);
+            $data['originalPriceInclTax']   = $this->formatAmount($baseOrgPrice);
+            $data['originalPriceExclTax']   = $this->formatAmount($orgPrice);
             $data['purchasePriceIncl']      = $this->formatAmount($purchasePriceIncl);
             $data['price']                  = $this->formatAmount($price);
             $data['tax']                    = $this->formatAmount($_item->getTaxAmount());
             $data['taxPercent']             = ($_item->getTaxPercent() / 100);
-            $data['rowTotalInclTax']        = $this->formatAmount($rowTotal);
-            $data['rowTotalExclTax']        = $this->formatAmount($rowTotal);
+            $data['rowTotalInclTax']        = $this->formatAmount($rowTotalIncl);
+            $data['rowTotalExclTax']        = $this->formatAmount($rowTotalExcl);
 
             $itemData[] = $data;
         }

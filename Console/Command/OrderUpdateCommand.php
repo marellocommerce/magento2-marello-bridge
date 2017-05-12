@@ -78,7 +78,7 @@ class OrderUpdateCommand extends Command
         $startTime = microtime(true);
         $output->writeln("<info>Starting Order Update</info>");
         try {
-            $this->orderStatusProcessor->process();
+            $this->orderStatusProcessor->process(null);
         } catch (\Exception $e) {
             $output->writeln("<error>{$e->getMessage()}</error>");
             // we must have an exit code higher than zero to indicate something was wrong

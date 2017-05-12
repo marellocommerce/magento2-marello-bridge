@@ -22,8 +22,9 @@ use Marello\Bridge\Api\Data\DataConverterInterface;
 use Marello\Bridge\Api\Data\DataConverterRegistryInterface;
 use Marello\Bridge\Api\Data\ConnectorRegistryInterface;
 use Marello\Bridge\Api\MarelloTransportInterface;
+use Marello\Bridge\Api\MarelloProcessorInterface;
 
-abstract class AbstractProcessor
+abstract class AbstractProcessor implements MarelloProcessorInterface
 {
     /** @var ConnectorRegistryInterface $connectorRegistry */
     protected $connectorRegistry;

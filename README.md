@@ -16,6 +16,7 @@ the customer is not in the Marello application.
 
 * PHP 5.5.0 or above with command line interface
 * Magento 2.1.0 or above**
+* Marello CE/EE 1.x
 * Marello Bridge Api 1.1 or above
 
 
